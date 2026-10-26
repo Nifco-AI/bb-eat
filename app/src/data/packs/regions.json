@@ -1,0 +1,40 @@
+{
+  "pack_id": "regions",
+  "kind": "region",
+  "version": "2026-10-26.r1",
+  "note": "内容适用地区、界面语言、时区与数据处理辖区是四件独立的事，分别建模。某地区的临床内容未通过审核时，不得借用另一地区的内容填补。",
+  "records": [
+    {
+      "code": "CN",
+      "name_zh": "中国大陆",
+      "name_en": "Mainland China",
+      "ui_languages": ["zh-Hans"],
+      "default_timezone": "Asia/Shanghai",
+      "common_timezones": ["Asia/Shanghai", "Asia/Urumqi"],
+      "data_jurisdiction": "数据仅保存在本机，不出境。本轮没有任何云端或跨境传输。",
+      "clinical_sources": ["cn_cns_iycf_2022"],
+      "clinical_review_status": "collected",
+      "clinical_available": false,
+      "unavailable_reason": "中国大陆适用的临床内容来源为全权保留版权，仅保存来源元数据与链接；且尚未获得独立专业审核，因此不提供个性化适龄或营养判断。",
+      "growth_reference": "who_growth_standards_2006",
+      "growth_reference_caveat": "WHO 生长标准是跨国参考，不是中国同龄宝宝的排名，也不能用于诊断。",
+      "dietary_context_note": "中国家庭常见辅食以米粥、面食、蒸制蔬菜与肉泥为主；本应用的食材目录已覆盖常见品类，但不对具体做法给出适龄结论。"
+    },
+    {
+      "code": "SG",
+      "name_zh": "新加坡",
+      "name_en": "Singapore",
+      "ui_languages": ["zh-Hans", "en"],
+      "default_timezone": "Asia/Singapore",
+      "common_timezones": ["Asia/Singapore"],
+      "data_jurisdiction": "数据仅保存在本机，不出境。本轮没有任何云端或跨境传输。",
+      "clinical_sources": ["sg_healthhub_weaning", "sg_healthhub_allergy"],
+      "clinical_review_status": "collected",
+      "clinical_available": false,
+      "unavailable_reason": "新加坡适用的临床内容来源版权全权保留，仅保存来源元数据与链接；且尚未获得独立专业审核，因此不提供个性化适龄或营养判断。",
+      "growth_reference": "who_growth_standards_2006",
+      "growth_reference_caveat": "WHO 生长标准是跨国参考，不是新加坡同龄宝宝的排名，也不能用于诊断。",
+      "dietary_context_note": "新加坡家庭饮食多元，常见本地食材与做法未必出现在当前食材目录中；未覆盖的食材可用手动输入记录。"
+    }
+  ]
+}

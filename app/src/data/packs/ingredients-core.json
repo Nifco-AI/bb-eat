@@ -1,0 +1,1073 @@
+{
+ "pack_id": "ingredients-core",
+ "kind": "ingredient",
+ "version": "2026-10-26.r1",
+ "note": "适用月龄一律未核验。第三方来源仅以限制方向（风险提示）编码，绝不转化为可以喂食的许可。",
+ "records": [
+  {
+   "id": "grain_rice",
+   "name_zh": "大米",
+   "name_en": "Rice",
+   "aliases": [
+    "稻米",
+    "白米"
+   ],
+   "food_group": "grain",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "煮至软烂，按宝宝咀嚼能力调整稠度。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "grain_rice_cereal_fortified",
+   "name_zh": "强化铁米粉",
+   "name_en": "Iron-fortified infant rice cereal",
+   "aliases": [
+    "婴儿米粉"
+   ],
+   "food_group": "grain",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "按包装说明用温水或奶液调配，不另加糖盐。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "grain_oat",
+   "name_zh": "燕麦",
+   "name_en": "Oat",
+   "aliases": [
+    "燕麦片"
+   ],
+   "food_group": "grain",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "grain_wheat_noodle",
+   "name_zh": "小麦面条",
+   "name_en": "Wheat noodle",
+   "aliases": [
+    "面条",
+    "挂面"
+   ],
+   "food_group": "grain",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "grain_millet",
+   "name_zh": "小米",
+   "name_en": "Millet",
+   "aliases": [
+    "粟米"
+   ],
+   "food_group": "grain",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "grain_corn",
+   "name_zh": "玉米",
+   "name_en": "Corn",
+   "aliases": [
+    "粟米",
+    "甜玉米"
+   ],
+   "food_group": "grain",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_potato",
+   "name_zh": "马铃薯",
+   "name_en": "Potato",
+   "aliases": [
+    "土豆",
+    "洋芋"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_sweet_potato",
+   "name_zh": "红薯",
+   "name_en": "Sweet potato",
+   "aliases": [
+    "地瓜",
+    "番薯"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_pumpkin",
+   "name_zh": "南瓜",
+   "name_en": "Pumpkin",
+   "aliases": [
+    "北瓜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_carrot",
+   "name_zh": "胡萝卜（熟）",
+   "name_en": "Carrot, cooked",
+   "aliases": [
+    "红萝卜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_carrot_raw",
+   "name_zh": "胡萝卜（生）",
+   "name_en": "Carrot, raw",
+   "aliases": [
+    "生胡萝卜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "high",
+   "choking_note": "生胡萝卜被 HealthHub 列为噎食风险食物",
+   "preparation_note": "生食形态质地坚硬，本应用不将其用于任何推荐。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "sg_healthhub_weaning",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_broccoli",
+   "name_zh": "西兰花",
+   "name_en": "Broccoli",
+   "aliases": [
+    "绿花椰菜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_spinach",
+   "name_zh": "菠菜",
+   "name_en": "Spinach",
+   "aliases": [],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_bok_choy",
+   "name_zh": "小白菜",
+   "name_en": "Bok choy",
+   "aliases": [
+    "青菜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_tomato",
+   "name_zh": "番茄",
+   "name_en": "Tomato",
+   "aliases": [
+    "西红柿"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_zucchini",
+   "name_zh": "西葫芦",
+   "name_en": "Zucchini",
+   "aliases": [
+    "夏南瓜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_cauliflower",
+   "name_zh": "花椰菜",
+   "name_en": "Cauliflower",
+   "aliases": [
+    "白花菜"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "veg_mushroom_shiitake",
+   "name_zh": "香菇",
+   "name_en": "Shiitake mushroom",
+   "aliases": [
+    "冬菇"
+   ],
+   "food_group": "vegetable",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_apple",
+   "name_zh": "苹果",
+   "name_en": "Apple",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_pear",
+   "name_zh": "梨",
+   "name_en": "Pear",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_banana",
+   "name_zh": "香蕉",
+   "name_en": "Banana",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_avocado",
+   "name_zh": "牛油果",
+   "name_en": "Avocado",
+   "aliases": [
+    "鳄梨"
+   ],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_blueberry",
+   "name_zh": "蓝莓",
+   "name_en": "Blueberry",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_grape",
+   "name_zh": "葡萄",
+   "name_en": "Grape",
+   "aliases": [
+    "提子"
+   ],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "high",
+   "choking_note": "整颗葡萄被 HealthHub 列为噎食风险食物",
+   "preparation_note": "整颗形态风险较高；是否以及如何改变形态需由专业指导决定，本应用不给出切法建议。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "sg_healthhub_weaning",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_raisin",
+   "name_zh": "葡萄干",
+   "name_en": "Raisin",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "high",
+   "choking_note": "整颗葡萄干被 HealthHub 列为噎食风险食物",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "sg_healthhub_weaning",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_papaya",
+   "name_zh": "木瓜",
+   "name_en": "Papaya",
+   "aliases": [],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fruit_orange",
+   "name_zh": "橙",
+   "name_en": "Orange",
+   "aliases": [
+    "柳橙"
+   ],
+   "food_group": "fruit",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "meat_pork_lean",
+   "name_zh": "猪瘦肉",
+   "name_en": "Pork, lean",
+   "aliases": [
+    "猪肉"
+   ],
+   "food_group": "meat",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "meat_beef_lean",
+   "name_zh": "牛瘦肉",
+   "name_en": "Beef, lean",
+   "aliases": [
+    "牛肉"
+   ],
+   "food_group": "meat",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "meat_chicken_breast",
+   "name_zh": "鸡胸肉",
+   "name_en": "Chicken breast",
+   "aliases": [
+    "鸡肉"
+   ],
+   "food_group": "meat",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "meat_pork_liver",
+   "name_zh": "猪肝",
+   "name_en": "Pork liver",
+   "aliases": [
+    "猪肝泥"
+   ],
+   "food_group": "meat",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "彻底煮熟后制成泥状；肝脏类食材的摄入频率需专业指导。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fish_cod",
+   "name_zh": "鳕鱼",
+   "name_en": "Cod",
+   "aliases": [],
+   "food_group": "fish",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "彻底煮熟并仔细去刺。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fish_salmon",
+   "name_zh": "三文鱼",
+   "name_en": "Salmon",
+   "aliases": [
+    "鲑鱼"
+   ],
+   "food_group": "fish",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "彻底煮熟并仔细去刺。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fish_shrimp",
+   "name_zh": "虾",
+   "name_en": "Shrimp",
+   "aliases": [
+    "虾仁"
+   ],
+   "food_group": "fish",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "彻底煮熟并去壳去肠线。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "egg_whole",
+   "name_zh": "鸡蛋",
+   "name_en": "Egg",
+   "aliases": [
+    "全蛋"
+   ],
+   "food_group": "egg",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": "彻底煮熟，不使用溏心或生蛋。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "egg_yolk",
+   "name_zh": "蛋黄",
+   "name_en": "Egg yolk",
+   "aliases": [],
+   "food_group": "egg",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "dairy_cheese",
+   "name_zh": "奶酪",
+   "name_en": "Cheese",
+   "aliases": [
+    "芝士"
+   ],
+   "food_group": "dairy",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "dairy_yogurt_plain",
+   "name_zh": "无糖酸奶",
+   "name_en": "Plain yogurt",
+   "aliases": [
+    "原味酸奶"
+   ],
+   "food_group": "dairy",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "legume_tofu",
+   "name_zh": "豆腐",
+   "name_en": "Tofu",
+   "aliases": [
+    "嫩豆腐"
+   ],
+   "food_group": "legume",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "legume_lentil",
+   "name_zh": "小扁豆",
+   "name_en": "Lentil",
+   "aliases": [
+    "兵豆"
+   ],
+   "food_group": "legume",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "legume_pea",
+   "name_zh": "豌豆",
+   "name_en": "Green pea",
+   "aliases": [
+    "青豆"
+   ],
+   "food_group": "legume",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "nut_peanut",
+   "name_zh": "花生",
+   "name_en": "Peanut",
+   "aliases": [
+    "落花生"
+   ],
+   "food_group": "nut_seed",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "high",
+   "choking_note": "整颗坚果被 HealthHub 列为噎食风险食物",
+   "preparation_note": "整颗形态风险较高；本应用不提供适龄处理建议。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "sg_healthhub_weaning",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "nut_walnut",
+   "name_zh": "核桃",
+   "name_en": "Walnut",
+   "aliases": [],
+   "food_group": "nut_seed",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "high",
+   "choking_note": "整颗坚果被 HealthHub 列为噎食风险食物",
+   "preparation_note": "整颗形态风险较高；本应用不提供适龄处理建议。",
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "sg_healthhub_weaning",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "nut_sesame_paste",
+   "name_zh": "芝麻酱",
+   "name_en": "Sesame paste",
+   "aliases": [
+    "麻酱"
+   ],
+   "food_group": "nut_seed",
+   "common_allergen": true,
+   "allergen_note": "常见致敏食物提示（来源 sg_healthhub_allergy）。这是提醒家长留意的标记，不是对你家宝宝是否过敏的判断，也不构成引入或回避的建议。",
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "fat_vegetable_oil",
+   "name_zh": "植物油",
+   "name_en": "Vegetable oil",
+   "aliases": [
+    "食用油"
+   ],
+   "food_group": "fat",
+   "common_allergen": false,
+   "allergen_note": null,
+   "choking_risk": "unknown",
+   "choking_note": "本应用没有找到针对该食材、可溯源的噎食风险分级，因此标记为未核验。",
+   "preparation_note": null,
+   "min_age_months": null,
+   "max_age_months": null,
+   "age_status": "general_principle_only",
+   "age_evidence": "WHO 一般性原则：满 6 月龄起在继续母乳喂养的基础上添加辅食（来源 who_iycf_factsheet）。该来源只给出阶段性原则，没有为单一食材规定起始月龄，因此本条目的适用月龄保持未核验。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  }
+ ]
+}

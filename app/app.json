@@ -22,7 +22,8 @@
       "android"
     ],
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-sharing"
     ],
     "extra": {
       "eas": {
