@@ -17,6 +17,7 @@ export const USER_TABLES = [
   'babies',
   'app_settings',
   'inventory_items',
+  'avoid_list',
   'meal_slots',
   'plan_items',
   'feeding_events',
@@ -100,12 +101,15 @@ function canonical(value: unknown): string {
 }
 
 function payloadFor(file: Omit<BackupFile, 'checksum'>): string {
+  // Every field of the file is covered, so no part of a backup can be edited
+  // without invalidating the checksum.
   return canonical({
     format: file.format,
     format_version: file.format_version,
     schema_version: file.schema_version,
     app_version: file.app_version,
     exported_at: file.exported_at,
+    pack_versions: file.pack_versions,
     row_counts: file.row_counts,
     tables: file.tables,
   });

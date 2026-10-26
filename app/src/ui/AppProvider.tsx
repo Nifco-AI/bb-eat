@@ -46,6 +46,10 @@ export function AppProvider({
 
   useEffect(() => {
     let cancelled = false;
+    // Migrating and loading the knowledge packs (several thousand WHO rows) is
+    // synchronous and takes long enough to drop the first frame. Deferring it
+    // past this tick lets the loading screen actually paint first.
+    const handle = setTimeout(() => {
     try {
       const db = createExpoDriver();
       migrate(db);
@@ -59,12 +63,22 @@ export function AppProvider({
         setBoot({ phase: 'error', message: e instanceof Error ? e.message : String(e) });
       }
     }
+    }, 0);
     return () => {
       cancelled = true;
+      clearTimeout(handle);
     };
   }, [attempt]);
 
   const refresh = useCallback(() => setRevision((r) => r + 1), []);
+
+  // An app left open across local midnight must roll over to the new day on
+  // its own, otherwise records would keep landing on yesterday.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setTick((v) => v + 1), 60000);
+    return () => clearInterval(t);
+  }, []);
 
   const value = useMemo<AppState | null>(() => {
     if (boot.phase !== 'ready') return null;
@@ -82,7 +96,8 @@ export function AppProvider({
       refresh,
     };
     // `revision` is intentionally a dependency: it is how writes invalidate reads.
-  }, [boot, revision, refresh]);
+    // `tick` recomputes `today` so an open app crosses local midnight correctly.
+  }, [boot, revision, refresh, tick]);
 
   if (boot.phase === 'loading') return renderLoading();
   if (boot.phase === 'error') return renderError(boot.message, () => setAttempt((a) => a + 1));

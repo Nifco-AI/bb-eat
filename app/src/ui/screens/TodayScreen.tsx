@@ -19,6 +19,7 @@ import { undoFact } from '../../domain/repositories/facts';
 import { daySummary } from '../../domain/summary';
 import { ageInMonths, shiftLocalDate, formatLocalDate } from '../../domain/time';
 import { IntakeMode, INTAKE_MODE_LABELS } from '../../domain/types';
+import { OccurredAtField, useOccurredAt } from '../OccurredAt';
 
 export function TodayScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
   const { db, baby, today, refresh, revision } = useApp();
@@ -140,6 +141,12 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
                     date,
                   })
                 }
+              />
+              <Button
+                label="＋ 加食谱"
+                variant="secondary"
+                style={{ marginRight: spacing.sm, marginBottom: spacing.sm }}
+                onPress={() => navigation.navigate('Recipes', { onPickSlotId: slot.id })}
               />
               <Button
                 label="记录这一餐"
@@ -271,15 +278,18 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
 
       <FeedingModal
         slot={feedingFor}
+        tz={baby.timezone}
+        today={today}
+        date={date}
         onClose={() => setFeedingFor(null)}
-        onSubmit={(mode, ratio, grams) => {
+        onSubmit={(mode, ratio, grams, occurredAt) => {
           try {
             const snapshot = snapshotFromSlot(db, feedingFor!.id);
             recordFeeding(db, {
               babyId: baby.id,
               mealSlotId: feedingFor!.id,
               mealLabel: feedingFor!.label,
-              occurredAt: new Date(),
+              occurredAt,
               timezone: baby.timezone,
               snapshot,
               intakeMode: mode,
@@ -294,6 +304,41 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
           }
         }}
       />
+      <SectionHeader title="资料与设置" />
+      <Card>
+        <Row style={{ flexWrap: 'wrap' }}>
+          <Button
+            label="食材库"
+            variant="secondary"
+            style={{ marginRight: spacing.sm, marginBottom: spacing.sm }}
+            onPress={() => navigation.navigate('Ingredients')}
+          />
+          <Button
+            label="食谱库"
+            variant="secondary"
+            style={{ marginRight: spacing.sm, marginBottom: spacing.sm }}
+            onPress={() => navigation.navigate('Recipes')}
+          />
+          <Button
+            label="家里有什么"
+            variant="secondary"
+            style={{ marginRight: spacing.sm, marginBottom: spacing.sm }}
+            onPress={() => navigation.navigate('Inventory')}
+          />
+          <Button
+            label="宝宝信息"
+            variant="secondary"
+            style={{ marginRight: spacing.sm, marginBottom: spacing.sm }}
+            onPress={() => navigation.navigate('BabyProfile')}
+          />
+          <Button
+            label="隐私与数据"
+            variant="secondary"
+            style={{ marginBottom: spacing.sm }}
+            onPress={() => navigation.navigate('Privacy')}
+          />
+        </Row>
+      </Card>
     </Screen>
   );
 }
@@ -357,16 +402,24 @@ function SlotEditorModal({
 
 function FeedingModal({
   slot,
+  tz,
+  today,
+  date,
   onClose,
   onSubmit,
 }: {
   slot: MealSlotView | null;
+  tz: string;
+  today: string;
+  date: string;
   onClose: () => void;
-  onSubmit: (mode: IntakeMode, ratio: number | null, grams: number | null) => void;
+  onSubmit: (mode: IntakeMode, ratio: number | null, grams: number | null, occurredAt: Date) => void;
 }) {
   const [mode, setMode] = useState<IntakeMode>('unknown');
   const [ratio, setRatio] = useState<number | null>(null);
   const [grams, setGrams] = useState('');
+  // Stamped onto the day the caregiver is actually looking at, not "now".
+  const [when, setWhenDate, setWhenTime] = useOccurredAt(tz, date);
 
   if (!slot) return null;
   const gramsValue = grams.trim() === '' ? null : Number(grams);
@@ -375,6 +428,7 @@ function FeedingModal({
     mode === 'none' ||
     (mode === 'ratio' && ratio !== null) ||
     (mode === 'absolute' && gramsValue !== null && Number.isFinite(gramsValue) && gramsValue >= 0);
+  const submittable = canSubmit && when.valid;
 
   return (
     <Modal visible animationType="slide" transparent onRequestClose={onClose}>
@@ -417,16 +471,18 @@ function FeedingModal({
           )}
 
           {(mode === 'ratio' || mode === 'absolute') && slot.items.length > 1 && (
-            <UnknownNotice text="这一餐有多种食材混合。每种食材各吃了多少仍记为不详，不会被估算。" />
+            <UnknownNotice text="这一餐有多种食材混合。整份吃了多少是已知的，但每种食材各吃了多少仍记为不详，不会被估算，也不会算作「吃到过」这种食材。" />
           )}
+
+          <OccurredAtField tz={tz} today={today} state={when} onDateChange={setWhenDate} onTimeChange={setWhenTime} />
 
           <Row style={{ justifyContent: 'flex-end', marginTop: spacing.lg }}>
             <Button label="取消" variant="ghost" onPress={onClose} />
             <Button
               label="保存"
-              disabled={!canSubmit}
+              disabled={!submittable}
               style={{ marginLeft: spacing.sm }}
-              onPress={() => onSubmit(mode, ratio, gramsValue)}
+              onPress={() => onSubmit(mode, ratio, gramsValue, when.toDate())}
             />
           </Row>
         </View>

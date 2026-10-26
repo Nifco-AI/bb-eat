@@ -10,8 +10,19 @@ import { Region } from '../../domain/types';
 
 export function RecommendScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
   const { db, baby, today, demoMode, setDemoMode, refresh, revision } = useApp();
-  const [avoid, setAvoid] = useState<string[]>([]);
   const [applied, setApplied] = useState<string | null>(null);
+
+  const avoidRows = useMemo(
+    () =>
+      db.all<{ ingredient_id: string; name_zh: string | null }>(
+        `SELECT a.ingredient_id, i.name_zh FROM avoid_list a
+         LEFT JOIN ingredients i ON i.id = a.ingredient_id
+         WHERE a.baby_id = ? AND a.status = 'active' ORDER BY a.created_at DESC`,
+        [baby.id],
+      ),
+    [db, baby.id, revision],
+  );
+  const avoid = useMemo(() => avoidRows.map((r) => r.ingredient_id), [avoidRows]);
 
   const slots = useMemo(() => listSlots(db, baby.id, today), [db, baby.id, today, revision]);
   const months = ageInMonths(baby.birth_date, today);
@@ -29,8 +40,7 @@ export function RecommendScreen({ navigation }: { navigation: { navigate: (s: st
             "SELECT ingredient_id FROM inventory_items WHERE baby_id = ? AND status = 'active' AND ingredient_id IS NOT NULL",
             [baby.id],
           )
-          .map((r) => r.ingredient_id),
-        maxPrepMinutes: null,
+          .map((r) => r.ingredient_id),        maxPrepMinutes: null,
         recentIngredientIds: [],
         demoMode,
       }),
@@ -147,8 +157,19 @@ export function RecommendScreen({ navigation }: { navigation: { navigate: (s: st
           <Text style={typography.caption}>没有排除任何食材。你可以在食材库中标记要回避的食材。</Text>
         ) : (
           <Row style={{ flexWrap: 'wrap' }}>
-            {avoid.map((a) => (
-              <Chip key={a} label={a} tone="danger" onPress={() => setAvoid(avoid.filter((x) => x !== a))} />
+            {avoidRows.map((a) => (
+              <Chip
+                key={a.ingredient_id}
+                label={`${a.name_zh ?? a.ingredient_id} ✕`}
+                tone="danger"
+                onPress={() => {
+                  db.run("UPDATE avoid_list SET status = 'removed' WHERE baby_id = ? AND ingredient_id = ?", [
+                    baby.id,
+                    a.ingredient_id,
+                  ]);
+                  refresh();
+                }}
+              />
             ))}
           </Row>
         )}

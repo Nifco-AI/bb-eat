@@ -209,13 +209,15 @@ export interface RecordSuspicionInput {
   rationale: string;
   occurredAt: Date;
   timezone: string;
+  opId?: string;
 }
 
 /** "I suspect X" — a caregiver hypothesis, never a diagnosis. */
 export function recordSuspicion(db: SqlDriver, input: RecordSuspicionInput): { id: string } {
   if (!input.rationale.trim()) throw new FactValidationError('请填写怀疑的理由');
   const stamp = stampFor(input.occurredAt, input.timezone);
-  const opId = opIdFor(['suspicion', input.babyId, input.ingredientId ?? input.freeText, stamp.occurred_at]);
+  const opId =
+    input.opId ?? opIdFor(['suspicion', input.babyId, input.ingredientId ?? input.freeText, stamp.occurred_at]);
   return db.transaction(() => {
     const dup = findByOpId(db, 'caregiver_suspicions', opId);
     if (dup) return { id: dup };

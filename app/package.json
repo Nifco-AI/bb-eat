@@ -39,7 +39,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "build:packs": "python3 scripts/build_content_packs.py",
-    "typecheck:tests": "tsc --noEmit -p tsconfig.test.json"
+    "typecheck:tests": "tsc --noEmit -p tsconfig.test.json",
+    "lint": "eslint ."
   },
   "private": true
 }

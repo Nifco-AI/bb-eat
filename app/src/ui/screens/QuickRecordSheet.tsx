@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Modal, Text, View } from 'react-native';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, ErrorState, Field, Row, UnknownNotice } from '../components';
+import { OccurredAtField, useOccurredAt } from '../OccurredAt';
 import { sheet, sheetBackdrop } from './TodayScreen';
+import { newId } from '../../domain/ids';
 import { spacing, typography } from '../theme';
 import {
   FactValidationError,
@@ -28,11 +30,20 @@ const TABS: { key: Tab; label: string }[] = [
  * tab is ever copied into another: tasting a food is not a reaction, and a
  * caregiver's suspicion is not a symptom or a diagnosis.
  */
-export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { db, baby, refresh } = useApp();
+export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
+  const { db, baby, today, refresh } = useApp();
   const [tab, setTab] = useState<Tab>('liquid');
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const [when, setWhenDate, setWhenTime] = useOccurredAt(baby.timezone, today);
+
+  // One submission == one client_op_id. Two taps on 保存 are the SAME submission,
+  // so they collide on the UNIQUE client_op_id and the second is a no-op. A new
+  // id is minted only after a successful save. The sheet is mounted fresh each
+  // time it is opened, so no reset effect is needed.
+  const opIdRef = useRef(newId('op'));
 
   const [kind, setKind] = useState<LiquidKind>('formula');
   const [ml, setMl] = useState('');
@@ -59,9 +70,16 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
   };
 
   const submit = () => {
+    if (busy) return;
     setError(null);
+    if (!when.valid) {
+      setError('请先把发生时间填写成 24 小时制的 时:分，例如 03:20。');
+      return;
+    }
+    setBusy(true);
     try {
-      const now = new Date();
+      const now = when.toDate();
+      const opId = opIdRef.current;
       if (tab === 'liquid') {
         const amount = amountUnknown || ml.trim() === '' ? null : Number(ml);
         recordLiquid(db, {
@@ -70,6 +88,7 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
           amountMl: amount,
           occurredAt: now,
           timezone: baby.timezone,
+          opId,
         });
         setDone(amount === null ? `已记录一次${LIQUID_LABELS[kind]}，量记为不详` : `已记录 ${amount} mL`);
       } else if (tab === 'exposure') {
@@ -80,6 +99,7 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
           amountG: exposureG.trim() === '' ? null : Number(exposureG),
           occurredAt: now,
           timezone: baby.timezone,
+          opId,
         });
         setDone('已记录一次食物接触。这只是接触记录，不代表任何反应。');
       } else if (tab === 'symptom') {
@@ -89,6 +109,7 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
           severity,
           occurredAt: now,
           timezone: baby.timezone,
+          opId,
         });
         setDone('已记录一条观察。应用不会把它和任何食物自动关联。');
       } else {
@@ -99,13 +120,17 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
           rationale: rationale.trim(),
           occurredAt: now,
           timezone: baby.timezone,
+          opId,
         });
         setDone('已记录你的怀疑。这是你的判断记录，不是诊断结论。');
       }
       reset();
+      opIdRef.current = newId('op');
       refresh();
     } catch (e) {
       setError(e instanceof FactValidationError ? e.message : String(e));
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -119,7 +144,7 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
           : rationale.trim() !== '';
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
       <View style={sheetBackdrop}>
         <View style={sheet}>
           <Text style={typography.title}>快速记录</Text>
@@ -249,9 +274,16 @@ export function QuickRecordSheet({ visible, onClose }: { visible: boolean; onClo
             </View>
           )}
 
+          <OccurredAtField tz={baby.timezone} today={today} state={when} onDateChange={setWhenDate} onTimeChange={setWhenTime} />
+
           <Row style={{ justifyContent: 'flex-end', marginTop: spacing.lg }}>
             <Button label="完成" variant="ghost" onPress={onClose} />
-            <Button label="保存" disabled={!canSubmit} style={{ marginLeft: spacing.sm }} onPress={submit} />
+            <Button
+              label={busy ? '保存中…' : '保存'}
+              disabled={!canSubmit || busy || !when.valid}
+              style={{ marginLeft: spacing.sm }}
+              onPress={submit}
+            />
           </Row>
         </View>
       </View>

@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider } from './src/ui/AppProvider';
 import { ErrorState, LoadingState } from './src/ui/components';
+import { ErrorBoundary } from './src/ui/ErrorBoundary';
 import { colors, MIN_TOUCH, shadow, typography } from './src/ui/theme';
 import { TodayScreen } from './src/ui/screens/TodayScreen';
 import { RecommendScreen } from './src/ui/screens/RecommendScreen';
@@ -56,9 +57,27 @@ function Tabs() {
         ),
       })}
     >
-      <Tab.Screen name="今日" component={TodayScreen} />
-      <Tab.Screen name="推荐" component={RecommendScreen} />
-      <Tab.Screen name="成长" component={GrowthScreen} />
+      <Tab.Screen name="今日">
+        {(p: any) => (
+          <ErrorBoundary label="今日">
+            <TodayScreen {...p} />
+          </ErrorBoundary>
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="推荐">
+        {(p: any) => (
+          <ErrorBoundary label="推荐">
+            <RecommendScreen {...p} />
+          </ErrorBoundary>
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="成长">
+        {(p: any) => (
+          <ErrorBoundary label="成长">
+            <GrowthScreen {...p} />
+          </ErrorBoundary>
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -114,7 +133,7 @@ function Shell() {
         <Text style={{ color: colors.onAccent, fontSize: 28, lineHeight: 32 }}>＋</Text>
       </Pressable>
 
-      <QuickRecordSheet visible={quick} onClose={() => setQuick(false)} />
+      {quick && <QuickRecordSheet onClose={() => setQuick(false)} />}
     </View>
   );
 }

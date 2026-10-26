@@ -75,8 +75,14 @@ export function daySummary(db: SqlDriver, babyId: string, localDate: string): Da
   );
   const liquids = summariseLiquids(liquidEvents);
 
-  const feedings = db.all<{ id: string; intake_mode: string }>(
-    "SELECT id, intake_mode FROM feeding_events WHERE baby_id = ? AND occurred_local_date = ? AND status = 'active'",
+  const feedings = db.all<{
+    id: string;
+    intake_mode: string;
+    intake_ratio: number | null;
+    intake_amount_g: number | null;
+  }>(
+    'SELECT id, intake_mode, intake_ratio, intake_amount_g FROM feeding_events ' +
+      "WHERE baby_id = ? AND occurred_local_date = ? AND status = 'active'",
     [babyId, localDate],
   );
 
@@ -97,10 +103,23 @@ export function daySummary(db: SqlDriver, babyId: string, localDate: string): Da
         else notEaten.add(r.ingredient_id);
         continue;
       }
-      // No per-ingredient figure. Only the whole-portion mode can tell us
-      // anything, and only at the two unambiguous extremes.
-      if (f.intake_mode === 'none') notEaten.add(r.ingredient_id);
-      else if (f.intake_mode === 'ratio' || f.intake_mode === 'absolute') eaten.add(r.ingredient_id);
+      // No per-ingredient figure. A whole-portion figure describes the bowl,
+      // not any single ingredient inside it.
+      //  - 'none' / a stated zero portion: nothing in the bowl was eaten, so
+      //    every ingredient is a known not-eaten.
+      //  - a positive portion on a SINGLE-ingredient meal: the bowl figure is
+      //    unambiguously that ingredient's figure.
+      //  - a positive portion on a MIXED meal: the baby ate some of the bowl,
+      //    but which ingredients reached the mouth is genuinely unknown. We
+      //    must not apportion it (U04), and "ate half the bowl" is not
+      //    evidence that any particular ingredient was tasted.
+      const portionIsZero =
+        (f.intake_mode === 'ratio' && (f.intake_ratio ?? 0) <= 0) ||
+        (f.intake_mode === 'absolute' && (f.intake_amount_g ?? 0) <= 0);
+
+      if (f.intake_mode === 'none' || portionIsZero) notEaten.add(r.ingredient_id);
+      else if ((f.intake_mode === 'ratio' || f.intake_mode === 'absolute') && rows.length === 1)
+        eaten.add(r.ingredient_id);
       else unknown.add(r.ingredient_id);
     }
   }
@@ -186,6 +205,10 @@ export function rangeSummary(db: SqlDriver, babyId: string, toDate: string, days
     [babyId, from, toDate],
   );
 
+  // Diversity must use exactly the same evidence rule as the daily summary:
+  // an explicit positive per-ingredient figure, or a positive whole-portion
+  // figure on a meal that contained only this one ingredient. A mixed-bowl
+  // ratio is never apportioned, and a stated zero is never "eaten".
   const eatenRows = db.all<{ ingredient_id: string; food_group: string }>(
     `SELECT DISTINCT fei.ingredient_id, i.food_group
      FROM feeding_events fe
@@ -194,7 +217,11 @@ export function rangeSummary(db: SqlDriver, babyId: string, toDate: string, days
      WHERE fe.baby_id = ? AND fe.occurred_local_date BETWEEN ? AND ? AND fe.status = 'active'
        AND fei.ingredient_id IS NOT NULL
        AND ( (fei.intake_known = 1 AND fei.intake_amount_g > 0)
-             OR (fei.intake_known = 0 AND fe.intake_mode IN ('ratio','absolute')) )`,
+             OR ( fei.intake_known = 0
+                  AND ( (fe.intake_mode = 'ratio' AND COALESCE(fe.intake_ratio, 0) > 0)
+                        OR (fe.intake_mode = 'absolute' AND COALESCE(fe.intake_amount_g, 0) > 0) )
+                  AND (SELECT COUNT(*) FROM feeding_event_ingredients x
+                       WHERE x.feeding_event_id = fe.id) = 1 ) )`,
     [babyId, from, toDate],
   );
 

@@ -4,6 +4,13 @@ import { Platform, TextStyle } from 'react-native';
  * A warm, calm palette. Backgrounds are soft cream rather than pure white so
  * long evening use is easier on the eyes; accents are muted sage and
  * terracotta rather than saturated "app" colours.
+ *
+ * Every text/background pair used in the app meets WCAG AA (>= 4.5:1). This is
+ * not cosmetic: captions carry the safety and "unknown" disclaimers, so they
+ * must stay legible in a dim room at 3am. Measured against the cream
+ * background #FBF7F0 — textMuted 7.0:1, textFaint 5.4:1, sage 6.6:1,
+ * terracotta 5.2:1, amber 5.9:1, danger 6.3:1, info 6.7:1; white on each solid
+ * accent is between 5.5:1 and 7.2:1.
  */
 export const colors = {
   bg: '#FBF7F0',
@@ -13,20 +20,20 @@ export const colors = {
   borderStrong: '#D4C6B0',
 
   text: '#3A3430',
-  textMuted: '#6E645C',
-  textFaint: '#9A8F84',
+  textMuted: '#5C534B',
+  textFaint: '#6B625A',
   onAccent: '#FFFFFF',
 
-  sage: '#7E9B7A',
+  sage: '#42603D',
   sageSoft: '#E8EFE6',
-  terracotta: '#C8795C',
+  terracotta: '#A4512F',
   terracottaSoft: '#F7E7DF',
-  amber: '#C9962F',
+  amber: '#7A5B10',
   amberSoft: '#FBF0D8',
 
-  danger: '#B4584F',
+  danger: '#9A3F36',
   dangerSoft: '#F8E4E1',
-  info: '#5D7D96',
+  info: '#3C5B73',
   infoSoft: '#E4EDF3',
 } as const;
 

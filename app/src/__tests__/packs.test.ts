@@ -1,5 +1,5 @@
 import { createNodeDriver } from '../db/nodeDriver';
-import { migrate, SCHEMA_VERSION } from '../db/migrations';
+import { MIGRATIONS, migrate, SCHEMA_VERSION } from '../db/migrations';
 import { loadPacks, WHO_SD_FIXTURES } from '../data/loadPacks';
 import { freshDb } from './helpers';
 
@@ -7,7 +7,7 @@ describe('migrations', () => {
   it('applies from scratch and is idempotent on a second open', () => {
     const db = createNodeDriver(':memory:');
     const first = migrate(db);
-    expect(first.applied).toEqual([1]);
+    expect(first.applied).toEqual(MIGRATIONS.map((m) => m.version));
     expect(first.to).toBe(SCHEMA_VERSION);
 
     const second = migrate(db);

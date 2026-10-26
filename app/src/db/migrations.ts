@@ -350,6 +350,51 @@ CREATE TABLE audit_log (
 CREATE INDEX idx_audit_entity ON audit_log(entity, entity_id);
 `,
   },
+  {
+    version: 2,
+    name: 'inventory_per_baby',
+    // Inventory is per-caregiver-baby, not global, and must allow a free-text
+    // entry for foods that are not in the ingredient pack. v1 modelled it as a
+    // global ingredient-only list, which no screen could actually use.
+    sql: `
+CREATE TABLE inventory_items_v2 (
+  id            TEXT PRIMARY KEY,
+  baby_id       TEXT NOT NULL,
+  ingredient_id TEXT,
+  free_text     TEXT,
+  qty_note      TEXT,
+  created_at    TEXT NOT NULL,
+  updated_at    TEXT NOT NULL,
+  status        TEXT NOT NULL DEFAULT 'active',
+  FOREIGN KEY (baby_id) REFERENCES babies(id),
+  FOREIGN KEY (ingredient_id) REFERENCES ingredients(id),
+  CHECK (ingredient_id IS NOT NULL OR free_text IS NOT NULL)
+);
+INSERT INTO inventory_items_v2 (id, baby_id, ingredient_id, free_text, qty_note, created_at, updated_at, status)
+  SELECT inv.id, (SELECT id FROM babies ORDER BY created_at LIMIT 1), inv.ingredient_id, NULL,
+         inv.qty_note, inv.updated_at, inv.updated_at, inv.status
+  FROM inventory_items inv
+  WHERE (SELECT COUNT(*) FROM babies) > 0;
+DROP TABLE inventory_items;
+ALTER TABLE inventory_items_v2 RENAME TO inventory_items;
+CREATE INDEX idx_inventory_baby ON inventory_items(baby_id, status);
+
+-- Foods the caregiver has chosen to avoid. This is a caregiver decision, never
+-- inferred from a suspicion or a symptom: the app must not silently conclude
+-- that a food is unsafe. Persisted so that the食材库 and 推荐 agree.
+CREATE TABLE avoid_list (
+  id            TEXT PRIMARY KEY,
+  baby_id       TEXT NOT NULL,
+  ingredient_id TEXT NOT NULL,
+  reason        TEXT,
+  created_at    TEXT NOT NULL,
+  status        TEXT NOT NULL DEFAULT 'active',
+  UNIQUE (baby_id, ingredient_id),
+  FOREIGN KEY (baby_id) REFERENCES babies(id),
+  FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+);
+`,
+  },
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;

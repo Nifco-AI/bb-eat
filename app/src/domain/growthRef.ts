@@ -25,7 +25,8 @@ export type ZScoreFailure =
   | 'sex_unknown'
   | 'birth_date_unknown'
   | 'age_out_of_range'
-  | 'measurement_method_unknown';
+  | 'measurement_method_unknown'
+  | 'measurement_method_mismatch';
 
 export interface ZScoreResult {
   ok: true;
@@ -51,9 +52,16 @@ export const BLOCK_MESSAGES: Record<ZScoreFailure, string> = {
   birth_date_unknown: '未填写出生日期，无法确定月龄，无法计算。',
   age_out_of_range: '该月龄超出已内置 WHO 参考表范围。',
   measurement_method_unknown: '未记录测量方式（卧位/立位），身长与身高参考口径不同，无法计算。',
+  measurement_method_mismatch:
+    'WHO 对该月龄使用的测量口径与本次记录的测量方式不一致（<24 月龄用卧位身长，≥24 月龄用立位身高），直接比较会产生系统性偏差，因此不计算。',
 };
 
-/** Exact value of the standard normal CDF, Abramowitz & Stegun 26.2.17. */
+/**
+ * Standard normal CDF via the Abramowitz & Stegun 7.1.26 rational
+ * approximation of erf (|error| < 1.5e-7). That is far finer than the
+ * percentile precision we display, but it is an approximation, not an exact
+ * value.
+ */
 export function normalCdf(z: number): number {
   const sign = z < 0 ? -1 : 1;
   const x = Math.abs(z) / Math.SQRT2;
@@ -145,12 +153,24 @@ export function computeZScore(db: SqlDriver, req: ZScoreRequest): ZScoreResult |
   if (req.indicator === 'length_for_age') {
     const expected = req.ageDays < 731 ? 'lying' : 'standing';
     if (!req.method || req.method === 'unknown') return blocked('measurement_method_unknown');
-    if (req.method !== expected) return blocked('measurement_method_unknown');
+    if (req.method !== expected) return blocked('measurement_method_mismatch');
+  }
+
+  // The WHO tables are daily and complete, so the only reason a row can be
+  // "near" rather than exact is that the requested age falls outside the
+  // published range. Never silently reuse the last row for an older child:
+  // that would quietly extrapolate beyond the standard.
+  const bounds = db.get<{ lo: number; hi: number }>(
+    'SELECT MIN(age_days) AS lo, MAX(age_days) AS hi FROM growth_reference WHERE indicator = ? AND sex = ?',
+    [req.indicator, req.sex],
+  );
+  if (!bounds || bounds.lo === null || req.ageDays < bounds.lo || req.ageDays > bounds.hi) {
+    return blocked('age_out_of_range');
   }
 
   const row = nearestRow(db, req.indicator, req.sex, req.ageDays);
   if (!row) return blocked('age_out_of_range');
-  if (Math.abs(row.age_days - req.ageDays) > 16) return blocked('age_out_of_range');
+  if (Math.abs(row.age_days - req.ageDays) > 1) return blocked('age_out_of_range');
 
   const z = lmsZScore(req.value, row.l, row.m, row.s, req.indicator === 'weight_for_age');
   return {

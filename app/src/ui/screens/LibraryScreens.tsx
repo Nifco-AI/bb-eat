@@ -4,6 +4,7 @@ import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ListTile, Row, Screen, SectionHeader } from '../components';
 import { colors, MIN_TOUCH, radius, spacing, typography } from '../theme';
 import { addPlanItem } from '../../domain/repositories/meals';
+import { newId } from '../../domain/ids';
 import {
   CHOKING_LABELS,
   FOOD_GROUP_LABELS,
@@ -29,15 +30,28 @@ export function IngredientsScreen({
   navigation: Nav;
   route: { params?: { onPickSlotId?: string; mode?: 'avoid' } };
 }) {
-  const { db, refresh, revision } = useApp();
+  const { db, baby, demoMode, refresh, revision } = useApp();
   const [query, setQuery] = useState('');
   const [group, setGroup] = useState<string | null>(null);
   const pickSlotId = route.params?.onPickSlotId;
+  const avoidMode = route.params?.mode === 'avoid';
+
+  const avoidIds = useMemo(() => {
+    const rows = db.all<{ ingredient_id: string }>(
+      "SELECT ingredient_id FROM avoid_list WHERE baby_id = ? AND status = 'active'",
+      [baby.id],
+    );
+    return new Set(rows.map((r) => r.ingredient_id));
+  }, [db, baby.id, revision]);
 
   const ingredients = useMemo(() => {
     const rows = db.all<Ingredient>('SELECT * FROM ingredients ORDER BY food_group, name_zh');
     const q = query.trim().toLowerCase();
     return rows.filter((i) => {
+      // Synthetic demo content must never be selectable into a real plan or a
+      // real avoid list. It stays visible in the browsable library (clearly
+      // badged) only when demo mode is on.
+      if (i.is_synthetic === 1 && (pickSlotId || avoidMode || !demoMode)) return false;
       if (group && i.food_group !== group) return false;
       if (!q) return true;
       const aliases = (JSON.parse(i.aliases_json) as string[]).join(' ').toLowerCase();
@@ -47,7 +61,7 @@ export function IngredientsScreen({
         aliases.includes(q)
       );
     });
-  }, [db, query, group, revision]);
+  }, [db, query, group, revision, pickSlotId, avoidMode, demoMode]);
 
   const groups = useMemo(
     () => db.all<{ food_group: string }>('SELECT DISTINCT food_group FROM ingredients ORDER BY food_group'),
@@ -56,9 +70,11 @@ export function IngredientsScreen({
 
   return (
     <Screen>
-      <Text style={typography.display}>{pickSlotId ? '选择食材' : '食材库'}</Text>
+      <Text style={typography.display}>{pickSlotId ? '选择食材' : avoidMode ? '选择要回避的食材' : '食材库'}</Text>
       <Text style={[typography.caption, { marginTop: spacing.xs, marginBottom: spacing.md }]}>
-        每条食材都标注了来源和审核状态。未核验的信息会如实写明「未核验」，不会被包装成建议。
+        {avoidMode
+          ? '你标记的回避食材会从推荐中排除。这是你的决定，应用不会自己判定任何食物过敏。'
+          : '每条食材都标注了来源和审核状态。未核验的信息会如实写明「未核验」，不会被包装成建议。'}
       </Text>
 
       <TextInput
@@ -109,6 +125,28 @@ export function IngredientsScreen({
                       navigation.goBack();
                     }}
                   />
+                ) : avoidMode ? (
+                  <Button
+                    label={avoidIds.has(i.id) ? '取消回避' : '回避'}
+                    variant={avoidIds.has(i.id) ? 'secondary' : 'danger'}
+                    onPress={() => {
+                      if (avoidIds.has(i.id)) {
+                        db.run("UPDATE avoid_list SET status = 'removed' WHERE baby_id = ? AND ingredient_id = ?", [
+                          baby.id,
+                          i.id,
+                        ]);
+                      } else {
+                        db.run(
+                          `INSERT INTO avoid_list (id, baby_id, ingredient_id, reason, created_at, status)
+                           VALUES (?,?,?,?,?,'active')
+                           ON CONFLICT (baby_id, ingredient_id)
+                           DO UPDATE SET status = 'active', created_at = excluded.created_at`,
+                          [newId('avoid'), baby.id, i.id, null, new Date().toISOString()],
+                        );
+                      }
+                      refresh();
+                    }}
+                  />
                 ) : undefined
               }
             />
@@ -145,29 +183,55 @@ export function IngredientsScreen({
   );
 }
 
-export function RecipesScreen({ navigation }: { navigation: Nav }) {
-  const { db, revision } = useApp();
-  const recipes = useMemo(
-    () => db.all<Recipe>('SELECT * FROM recipes ORDER BY is_synthetic, name_zh'),
-    [db, revision],
-  );
+export function RecipesScreen({
+  navigation,
+  route,
+}: {
+  navigation: Nav;
+  route?: { params?: { onPickSlotId?: string } };
+}) {
+  const { db, demoMode, refresh, revision } = useApp();
+  const pickSlotId = route?.params?.onPickSlotId;
+  const recipes = useMemo(() => {
+    const rows = db.all<Recipe>('SELECT * FROM recipes ORDER BY is_synthetic, name_zh');
+    // Synthetic recipes are browsable only in demo mode and are never
+    // selectable into a real meal plan.
+    return rows.filter((r) => r.is_synthetic !== 1 || (!pickSlotId && demoMode));
+  }, [db, revision, pickSlotId, demoMode]);
   return (
     <Screen>
-      <Text style={typography.display}>食谱</Text>
+      <Text style={typography.display}>{pickSlotId ? '选择食谱' : '食谱'}</Text>
       <Text style={[typography.caption, { marginTop: spacing.xs, marginBottom: spacing.md }]}>
         食谱为本应用编写，未经外部专业审核，仅供参考与手动安排使用。
       </Text>
-      {recipes.map((r) => (
-        <Card key={r.id}>
-          <ListTile
-            title={r.name_zh}
-            subtitle={`${TEXTURE_LABELS[r.texture] ?? r.texture}${r.time_cost_min ? ` · 约 ${r.time_cost_min} 分钟` : ''}`}
-            onPress={() => navigation.navigate('RecipeDetail', { recipeId: r.id })}
-            accessibilityHint="查看做法与安全提示"
-            right={r.is_synthetic === 1 ? <Chip label="合成演示" tone="info" /> : undefined}
-          />
-        </Card>
-      ))}
+      {recipes.length === 0 ? (
+        <EmptyState title="没有可选的食谱" body="内置食谱均未通过外部专业审核，你仍可直接用食材安排这一餐。" />
+      ) : (
+        recipes.map((r) => (
+          <Card key={r.id}>
+            <ListTile
+              title={r.name_zh}
+              subtitle={`${TEXTURE_LABELS[r.texture] ?? r.texture}${r.time_cost_min ? ` · 约 ${r.time_cost_min} 分钟` : ''}`}
+              onPress={() => navigation.navigate('RecipeDetail', { recipeId: r.id })}
+              accessibilityHint="查看做法与安全提示"
+              right={
+                pickSlotId ? (
+                  <Button
+                    label="加入这一餐"
+                    onPress={() => {
+                      addPlanItem(db, pickSlotId, { recipe_id: r.id });
+                      refresh();
+                      navigation.goBack();
+                    }}
+                  />
+                ) : r.is_synthetic === 1 ? (
+                  <Chip label="合成演示" tone="info" />
+                ) : undefined
+              }
+            />
+          </Card>
+        ))
+      )}
     </Screen>
   );
 }
