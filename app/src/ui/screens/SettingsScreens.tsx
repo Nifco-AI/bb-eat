@@ -363,11 +363,6 @@ export function PrivacyScreen({ navigation }: { navigation: { navigate: (s: stri
           subtitle="每条内置资料的出处与许可"
           onPress={() => navigation.navigate('Sources')}
         />
-        <ListTile
-          title="隐私与数据"
-          subtitle="数据存在哪里、是否加密、如何删除"
-          onPress={() => navigation.navigate('Privacy')}
-        />
       </Card>
 
       <Card tone="warn">

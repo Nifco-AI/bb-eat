@@ -4,13 +4,14 @@ import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ListTile, Row, Screen, SectionHeader, SyntheticBanner } from '../components';
 import { colors, spacing, typography } from '../theme';
 import { recommend } from '../../domain/recommend';
-import { listSlots, createSlot, addPlanItem } from '../../domain/repositories/meals';
+import { listSlots, createSlot, addPlanItem, SyntheticContentError } from '../../domain/repositories/meals';
 import { ageInMonths } from '../../domain/time';
 import { Region } from '../../domain/types';
 
 export function RecommendScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
   const { db, baby, today, demoMode, setDemoMode, refresh, revision } = useApp();
   const [applied, setApplied] = useState<string | null>(null);
+  const [planError, setPlanError] = useState<string | null>(null);
 
   const avoidRows = useMemo(
     () =>
@@ -59,7 +60,7 @@ export function RecommendScreen({ navigation }: { navigation: { navigate: (s: st
           <View style={{ flex: 1, paddingRight: spacing.md }}>
             <Text style={typography.bodyStrong}>演示模式</Text>
             <Text style={[typography.caption, { marginTop: 2 }]}>
-              使用明确标注的合成数据展示推荐界面与排序逻辑。合成内容不会进入你的真实记录，也不是喂养建议。
+              使用明确标注的合成数据展示推荐界面与排序逻辑。合成内容不能加入计划、库存或任何真实记录，也不是喂养建议。
             </Text>
           </View>
           <Switch
@@ -132,22 +133,37 @@ export function RecommendScreen({ navigation }: { navigation: { navigate: (s: st
           </View>
 
           <Button
-            label={applied === c.id ? '已加入今天的计划' : '加入今天的计划'}
-            disabled={applied === c.id}
+            label={
+              demoMode
+                ? '演示内容不能加入计划'
+                : applied === c.id
+                  ? '已加入今天的计划'
+                  : '加入今天的计划'
+            }
+            disabled={demoMode || applied === c.id}
             style={{ marginTop: spacing.lg }}
             onPress={() => {
-              for (const s of c.slots) {
-                const existing = listSlots(db, baby.id, today).find((x) => x.label === s.label);
-                const slot = existing ?? createSlot(db, baby.id, today, s.label, null);
-                addPlanItem(db, slot.id, { recipe_id: s.recipe.id });
+              try {
+                for (const s of c.slots) {
+                  const existing = listSlots(db, baby.id, today).find((x) => x.label === s.label);
+                  const slot = existing ?? createSlot(db, baby.id, today, s.label, null);
+                  addPlanItem(db, slot.id, { recipe_id: s.recipe.id });
+                }
+                setApplied(c.id);
+                refresh();
+              } catch (e) {
+                setPlanError(e instanceof SyntheticContentError ? e.message : String(e));
               }
-              setApplied(c.id);
-              refresh();
             }}
           />
           <Text style={[typography.caption, { marginTop: spacing.sm }]}>
             加入计划只是写进今天的安排，不会被算作已经吃过。
           </Text>
+          {planError ? (
+            <Text style={[typography.caption, { marginTop: spacing.xs, color: colors.danger }]}>
+              {planError}
+            </Text>
+          ) : null}
         </Card>
       ))}
 

@@ -82,6 +82,25 @@ function Tabs() {
   );
 }
 
+/**
+ * Wraps a stack screen in an ErrorBoundary. Memoised per screen so the
+ * navigator sees a stable component type and does not remount on every render.
+ */
+const guarded = new Map<string, React.ComponentType>();
+function guard<P extends object>(label: string, Component: React.ComponentType<P>): React.ComponentType {
+  const cached = guarded.get(label);
+  if (cached) return cached;
+  const Wrapped = (props: P) => (
+    <ErrorBoundary label={label}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+  Wrapped.displayName = `Guarded(${label})`;
+  const asScreen = Wrapped as React.ComponentType;
+  guarded.set(label, asScreen);
+  return asScreen;
+}
+
 /** The quick-record button is global: recording must never be more than one tap away. */
 function Shell() {
   const [quick, setQuick] = useState(false);
@@ -96,15 +115,20 @@ function Shell() {
         }}
       >
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-        <Stack.Screen name="PickIngredient" component={IngredientsScreen} options={{ title: '选择食材' }} />
-        <Stack.Screen name="Ingredients" component={IngredientsScreen} options={{ title: '食材库' }} />
-        <Stack.Screen name="Recipes" component={RecipesScreen} options={{ title: '食谱' }} />
-        <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen as React.ComponentType} options={{ title: '食谱详情' }} />
-        <Stack.Screen name="Inventory" component={InventoryScreen} options={{ title: '家里有什么' }} />
-        <Stack.Screen name="BabyProfile" component={BabyProfileScreen} options={{ title: '宝宝信息' }} />
-        <Stack.Screen name="Backup" component={BackupScreen} options={{ title: '备份与恢复' }} />
-        <Stack.Screen name="Sources" component={SourcesScreen} options={{ title: '资料来源' }} />
-        <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ title: '隐私与数据' }} />
+        {/*
+          Every pushed screen is wrapped too, not just the tabs. These screens
+          run their own SQL, so a schema drift in any one of them would
+          otherwise white-screen the whole app instead of reporting itself.
+        */}
+        <Stack.Screen name="PickIngredient" component={guard('选择食材', IngredientsScreen)} options={{ title: '选择食材' }} />
+        <Stack.Screen name="Ingredients" component={guard('食材库', IngredientsScreen)} options={{ title: '食材库' }} />
+        <Stack.Screen name="Recipes" component={guard('食谱', RecipesScreen)} options={{ title: '食谱' }} />
+        <Stack.Screen name="RecipeDetail" component={guard('食谱详情', RecipeDetailScreen as React.ComponentType)} options={{ title: '食谱详情' }} />
+        <Stack.Screen name="Inventory" component={guard('家里有什么', InventoryScreen)} options={{ title: '家里有什么' }} />
+        <Stack.Screen name="BabyProfile" component={guard('宝宝信息', BabyProfileScreen)} options={{ title: '宝宝信息' }} />
+        <Stack.Screen name="Backup" component={guard('备份与恢复', BackupScreen)} options={{ title: '备份与恢复' }} />
+        <Stack.Screen name="Sources" component={guard('资料来源', SourcesScreen)} options={{ title: '资料来源' }} />
+        <Stack.Screen name="Privacy" component={guard('隐私与数据', PrivacyScreen)} options={{ title: '隐私与数据' }} />
       </Stack.Navigator>
 
       <Pressable

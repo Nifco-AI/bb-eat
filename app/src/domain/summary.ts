@@ -113,12 +113,24 @@ export function daySummary(db: SqlDriver, babyId: string, localDate: string): Da
       //    but which ingredients reached the mouth is genuinely unknown. We
       //    must not apportion it (U04), and "ate half the bowl" is not
       //    evidence that any particular ingredient was tasted.
+      //  - a NULL figure under mode 'ratio'/'absolute': the mode claims a
+      //    figure exists but none was stored. `recordFeeding` rejects this, but
+      //    a restored or foreign backup can still contain it, and treating a
+      //    missing number as zero would silently turn an unknown into a known
+      //    not-eaten. Unknown is the only safe reading.
       const portionIsZero =
-        (f.intake_mode === 'ratio' && (f.intake_ratio ?? 0) <= 0) ||
-        (f.intake_mode === 'absolute' && (f.intake_amount_g ?? 0) <= 0);
+        (f.intake_mode === 'ratio' && f.intake_ratio !== null && f.intake_ratio <= 0) ||
+        (f.intake_mode === 'absolute' && f.intake_amount_g !== null && f.intake_amount_g <= 0);
+      const portionIsMissing =
+        (f.intake_mode === 'ratio' && f.intake_ratio === null) ||
+        (f.intake_mode === 'absolute' && f.intake_amount_g === null);
 
       if (f.intake_mode === 'none' || portionIsZero) notEaten.add(r.ingredient_id);
-      else if ((f.intake_mode === 'ratio' || f.intake_mode === 'absolute') && rows.length === 1)
+      else if (
+        (f.intake_mode === 'ratio' || f.intake_mode === 'absolute') &&
+        !portionIsMissing &&
+        rows.length === 1
+      )
         eaten.add(r.ingredient_id);
       else unknown.add(r.ingredient_id);
     }

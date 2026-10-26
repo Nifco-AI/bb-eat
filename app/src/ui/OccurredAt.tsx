@@ -9,6 +9,14 @@ import { instantFromLocal, localTimeFrom, offsetMinutesFor, shiftLocalDate } fro
  * `new Date()` at save time makes back-filling impossible and silently files a
  * record under today even when the caregiver is looking at another day. This
  * control keeps the local date and local time explicit and editable.
+ *
+ * The defaults are *followed*, not copied. A form that stays mounted (a modal
+ * rendered by a screen, or a screen left open for hours) would otherwise keep
+ * offering the date and time it was first mounted at — which silently files the
+ * meal under the wrong day and stamps it with the wrong time, while showing a
+ * control that looks correct. Until the caregiver edits a field, that field
+ * tracks the caller's current value; once edited, their input is never
+ * overwritten.
  */
 export type OccurredAtState = {
   localDate: string;
@@ -24,9 +32,16 @@ export function nowLocalTime(tz: string): string {
   return localTimeFrom(now, offsetMinutesFor(new Date(now), tz));
 }
 
-export function useOccurredAt(tz: string, defaultLocalDate: string): [OccurredAtState, (d: string) => void, (t: string) => void, () => void] {
-  const [localDate, setLocalDate] = useState(defaultLocalDate);
-  const [localTime, setLocalTime] = useState(() => nowLocalTime(tz));
+export function useOccurredAt(
+  tz: string,
+  defaultLocalDate: string,
+  defaultLocalTime: string
+): [OccurredAtState, (d: string) => void, (t: string) => void, () => void] {
+  const [editedDate, setEditedDate] = useState<string | null>(null);
+  const [editedTime, setEditedTime] = useState<string | null>(null);
+
+  const localDate = editedDate ?? defaultLocalDate;
+  const localTime = editedTime ?? defaultLocalTime;
 
   const state = useMemo<OccurredAtState>(() => {
     const valid = HHMM.test(localTime.trim());
@@ -39,11 +54,11 @@ export function useOccurredAt(tz: string, defaultLocalDate: string): [OccurredAt
   }, [localDate, localTime, tz]);
 
   const reset = () => {
-    setLocalDate(defaultLocalDate);
-    setLocalTime(nowLocalTime(tz));
+    setEditedDate(null);
+    setEditedTime(null);
   };
 
-  return [state, setLocalDate, setLocalTime, reset];
+  return [state, setEditedDate, setEditedTime, reset];
 }
 
 export function OccurredAtField({

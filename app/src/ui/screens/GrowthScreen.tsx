@@ -17,7 +17,7 @@ import { newId } from '../../domain/ids';
 import { ListTile } from '../components';
 
 export function GrowthScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
-  const { db, baby, today, refresh, revision } = useApp();
+  const { db, baby, today, nowTime, refresh, revision } = useApp();
   const [kind, setKind] = useState<'weight' | 'length'>('weight');
   const [value, setValue] = useState('');
   const [unit, setUnit] = useState<'kg' | 'g' | 'cm'>('kg');
@@ -26,8 +26,11 @@ export function GrowthScreen({ navigation }: { navigation: { navigate: (s: strin
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<GrowthMeasurement | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [when, setWhenDate, setWhenTime, resetWhen] = useOccurredAt(baby.timezone, today);
+  const [when, setWhenDate, setWhenTime, resetWhen] = useOccurredAt(baby.timezone, today, nowTime);
   const opIdRef = useRef(newId('op'));
+  // Synchronous re-entry guard. `busy` is state and React batches updates, so
+  // two taps in one batch would both observe `busy === false`.
+  const submittingRef = useRef(false);
 
   const measurements = useMemo(
     () => listGrowth(db, baby.id, kind),
@@ -155,7 +158,8 @@ export function GrowthScreen({ navigation }: { navigation: { navigate: (s: strin
           label={busy ? '保存中…' : '保存测量'}
           disabled={value.trim() === '' || busy || !when.valid}
           onPress={() => {
-            if (busy) return;
+            if (submittingRef.current || busy) return;
+            submittingRef.current = true;
             setError(null);
             if (!when.valid) {
               setError('请先把测量时间填写成 24 小时制的 时:分。');
@@ -180,6 +184,7 @@ export function GrowthScreen({ navigation }: { navigation: { navigate: (s: strin
             } catch (e) {
               setError(e instanceof FactValidationError ? e.message : String(e));
             } finally {
+              submittingRef.current = false;
               setBusy(false);
             }
           }}

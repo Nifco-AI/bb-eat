@@ -4,7 +4,14 @@ import { sha256Hex } from './sha256';
 import { PACK_VERSIONS } from '../data/loadPacks';
 
 export const BACKUP_FORMAT = 'bbeat.backup';
-export const BACKUP_FORMAT_VERSION = 1;
+/**
+ * v1 → v2 bumped when `pack_versions` joined the checksum payload and when
+ * `inventory_items` gained `baby_id`/`free_text`. Both changes alter how a file
+ * must be read, so a v1 file verified with v2 rules would fail its checksum and
+ * be reported to the caregiver as corrupt when it is merely older. v1 is still
+ * accepted and upgraded on restore.
+ */
+export const BACKUP_FORMAT_VERSION = 2;
 
 /**
  * Only caregiver-entered data is exported.
@@ -102,14 +109,18 @@ function canonical(value: unknown): string {
 
 function payloadFor(file: Omit<BackupFile, 'checksum'>): string {
   // Every field of the file is covered, so no part of a backup can be edited
-  // without invalidating the checksum.
+  // without invalidating the checksum. v1 files were written before
+  // `pack_versions` was covered, so they must be verified with the payload
+  // shape that was actually signed — otherwise an intact old backup is
+  // misreported as corrupt.
+  const legacy = file.format_version < 2;
   return canonical({
     format: file.format,
     format_version: file.format_version,
     schema_version: file.schema_version,
     app_version: file.app_version,
     exported_at: file.exported_at,
-    pack_versions: file.pack_versions,
+    ...(legacy ? {} : { pack_versions: file.pack_versions }),
     row_counts: file.row_counts,
     tables: file.tables,
   });
@@ -227,6 +238,26 @@ export interface RestoreReport {
 }
 
 /**
+ * Brings a row from an older backup format up to the current schema.
+ *
+ * v1 `inventory_items` had no `baby_id`, which the current schema declares NOT
+ * NULL. Inserting such a row raw throws a bare SQL error that the caregiver
+ * would see as unexplained failure, so the single baby in the same backup is
+ * adopted as the owner. If the backup has no baby to attribute them to the row
+ * is left as-is and rejected below — guessing an owner would be worse.
+ */
+function upgradeRow(
+  file: BackupFile,
+  table: string,
+  row: Record<string, unknown>,
+): Record<string, unknown> {
+  if (file.format_version >= 2 || table !== 'inventory_items' || 'baby_id' in row) return row;
+  const babies = file.tables.babies ?? [];
+  if (babies.length !== 1) return row;
+  return { ...row, baby_id: babies[0].id, created_at: row.created_at ?? row.updated_at ?? null };
+}
+
+/**
  * Replaces caregiver data with the backup's contents, atomically.
  *
  * The caller is responsible for showing `inspectBackup`'s summary and getting
@@ -243,7 +274,7 @@ export function restoreBackup(db: SqlDriver, text: string): RestoreReport {
     }
     const restored: Record<string, number> = {};
     for (const table of USER_TABLES) {
-      const rows = file.tables[table] ?? [];
+      const rows = (file.tables[table] ?? []).map((row) => upgradeRow(file, table, row));
       const columns = db.all<{ name: string }>(`PRAGMA table_info(${table})`).map((c) => c.name);
       let n = 0;
       for (const row of rows) {

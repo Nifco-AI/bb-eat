@@ -370,11 +370,16 @@ CREATE TABLE inventory_items_v2 (
   FOREIGN KEY (ingredient_id) REFERENCES ingredients(id),
   CHECK (ingredient_id IS NOT NULL OR free_text IS NOT NULL)
 );
+-- No "babies exist" guard here: if there are inventory rows but no baby to
+-- attribute them to, baby_id resolves to NULL and the NOT NULL constraint
+-- aborts the migration. That is deliberate. Skipping the rows instead would
+-- silently delete caregiver data inside a migration, which is the one place a
+-- silent delete is hardest to notice. With no rows to carry, nothing is
+-- selected and the migration proceeds normally.
 INSERT INTO inventory_items_v2 (id, baby_id, ingredient_id, free_text, qty_note, created_at, updated_at, status)
   SELECT inv.id, (SELECT id FROM babies ORDER BY created_at LIMIT 1), inv.ingredient_id, NULL,
          inv.qty_note, inv.updated_at, inv.updated_at, inv.status
-  FROM inventory_items inv
-  WHERE (SELECT COUNT(*) FROM babies) > 0;
+  FROM inventory_items inv;
 DROP TABLE inventory_items;
 ALTER TABLE inventory_items_v2 RENAME TO inventory_items;
 CREATE INDEX idx_inventory_baby ON inventory_items(baby_id, status);

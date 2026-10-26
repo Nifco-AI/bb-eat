@@ -91,11 +91,35 @@ export function removeSlot(db: SqlDriver, slotId: string): void {
   });
 }
 
+export class SyntheticContentError extends Error {
+  constructor(public readonly table: 'recipes' | 'ingredients', public readonly rowId: string) {
+    super('演示用的合成内容不能加入真实的计划或记录。');
+    this.name = 'SyntheticContentError';
+  }
+}
+
+/**
+ * Fail-closed guard: synthetic demo rows exist only to show the interface when
+ * there is nothing real to show. They carry no evidence, so letting one reach a
+ * plan item would put fabricated content into a caregiver's real feeding
+ * history and day summary.
+ */
+function assertNotSynthetic(db: SqlDriver, table: 'recipes' | 'ingredients', rowId: string | null): void {
+  if (!rowId) return;
+  const row = db.get<{ is_synthetic: number }>(`SELECT is_synthetic FROM ${table} WHERE id = ?`, [rowId]);
+  if (row && row.is_synthetic) throw new SyntheticContentError(table, rowId);
+}
+
 export function addPlanItem(
   db: SqlDriver,
   slotId: string,
   item: { recipe_id?: string | null; ingredient_id?: string | null; free_text?: string | null; amount_g?: number | null },
 ): PlanItem {
+  // The UI promises that synthetic demo content never enters real records.
+  // Enforce that here rather than in each picker, so no screen can breach it:
+  // a plan item becomes a feeding snapshot, which becomes the day summary.
+  assertNotSynthetic(db, 'recipes', item.recipe_id ?? null);
+  assertNotSynthetic(db, 'ingredients', item.ingredient_id ?? null);
   const id = newId('plan');
   const amount = item.amount_g ?? null;
   db.run(

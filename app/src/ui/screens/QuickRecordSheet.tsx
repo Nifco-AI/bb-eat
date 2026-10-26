@@ -31,19 +31,21 @@ const TABS: { key: Tab; label: string }[] = [
  * caregiver's suspicion is not a symptom or a diagnosis.
  */
 export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
-  const { db, baby, today, refresh } = useApp();
+  const { db, baby, today, nowTime, refresh } = useApp();
   const [tab, setTab] = useState<Tab>('liquid');
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const [when, setWhenDate, setWhenTime] = useOccurredAt(baby.timezone, today);
+  const [when, setWhenDate, setWhenTime] = useOccurredAt(baby.timezone, today, nowTime);
 
   // One submission == one client_op_id. Two taps on 保存 are the SAME submission,
   // so they collide on the UNIQUE client_op_id and the second is a no-op. A new
   // id is minted only after a successful save. The sheet is mounted fresh each
   // time it is opened, so no reset effect is needed.
   const opIdRef = useRef(newId('op'));
+  /** Synchronous re-entry guard; see `submit`. */
+  const submittingRef = useRef(false);
 
   const [kind, setKind] = useState<LiquidKind>('formula');
   const [ml, setMl] = useState('');
@@ -70,7 +72,12 @@ export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
   };
 
   const submit = () => {
-    if (busy) return;
+    // A ref, not the `busy` state: React batches state updates, so two taps
+    // landing in the same batch would both still observe `busy === false`.
+    // The ref flips synchronously, so the second tap returns immediately.
+    // The UNIQUE client_op_id is the backstop if it ever gets through anyway.
+    if (submittingRef.current || busy) return;
+    submittingRef.current = true;
     setError(null);
     if (!when.valid) {
       setError('请先把发生时间填写成 24 小时制的 时:分，例如 03:20。');
@@ -130,6 +137,7 @@ export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
     } catch (e) {
       setError(e instanceof FactValidationError ? e.message : String(e));
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   };

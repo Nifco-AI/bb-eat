@@ -347,7 +347,12 @@ export function InventoryScreen() {
   const matches = useMemo(() => {
     const q = query.trim();
     if (!q) return [];
-    return db.all<Ingredient>('SELECT * FROM ingredients WHERE name_zh LIKE ? LIMIT 12', [`%${q}%`]);
+    return db.all<Ingredient>(
+      // Synthetic demo rows must never become inventory: inventory feeds
+      // `recommend()` and the day summary, both of which are real records.
+      'SELECT * FROM ingredients WHERE name_zh LIKE ? AND is_synthetic = 0 LIMIT 12',
+      [`%${q}%`]
+    );
   }, [db, query]);
 
   return (

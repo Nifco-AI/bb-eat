@@ -5,12 +5,18 @@ import { migrate } from '../db/migrations';
 import { loadPacks } from '../data/loadPacks';
 import { ensureBaby, getBaby, getFlag, setFlag } from '../domain/repositories/babies';
 import { Baby } from '../domain/types';
-import { deviceTimezone, stampFor } from '../domain/time';
+import { deviceTimezone, localTimeFrom, offsetMinutesFor, stampFor } from '../domain/time';
 
 interface AppState {
   db: SqlDriver;
   baby: Baby;
   today: string;
+  /**
+   * Current local wall-clock time, recomputed on the same tick as `today`.
+   * Forms read it from here rather than calling the clock during render, so an
+   * open form keeps offering the real current time instead of its mount time.
+   */
+  nowTime: string;
   demoMode: boolean;
   setDemoMode: (v: boolean) => void;
   /** Bumped after every write so screens re-read from SQLite rather than caching. */
@@ -83,10 +89,13 @@ export function AppProvider({
   const value = useMemo<AppState | null>(() => {
     if (boot.phase !== 'ready') return null;
     const fresh = getBaby(boot.db) ?? boot.baby;
+    const tz = fresh.timezone || deviceTimezone();
+    const now = new Date();
     return {
       db: boot.db,
       baby: fresh,
-      today: stampFor(new Date(), fresh.timezone || deviceTimezone()).occurred_local_date,
+      today: stampFor(now, tz).occurred_local_date,
+      nowTime: localTimeFrom(now.getTime(), offsetMinutesFor(now, tz)),
       demoMode: boot.demoMode,
       setDemoMode: (v: boolean) => {
         setFlag(boot.db, 'demo_mode', v);

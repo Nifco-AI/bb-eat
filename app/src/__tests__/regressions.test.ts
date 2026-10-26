@@ -1,11 +1,12 @@
 import { freshDb, babyWithProfile, TZ } from './helpers';
-import { createSlot, addPlanItem, snapshotFromSlot } from '../domain/repositories/meals';
+import { createSlot, addPlanItem, snapshotFromSlot, SyntheticContentError } from '../domain/repositories/meals';
 import { recordFeeding } from '../domain/repositories/feeding';
 import { recordLiquid, recordExposure, recordSuspicion, recordSymptom } from '../domain/repositories/events';
 import { recordGrowth } from '../domain/repositories/growth';
 import { daySummary, rangeSummary } from '../domain/summary';
 import { computeZScore } from '../domain/growthRef';
-import { exportBackup, serialiseBackup, inspectBackup, BackupRejected } from '../domain/backup';
+import { exportBackup, serialiseBackup, inspectBackup, restoreBackup, BackupRejected } from '../domain/backup';
+import { sha256Hex } from '../domain/sha256';
 import { MIGRATIONS, migrate } from '../db/migrations';
 import { createNodeDriver } from '../db/nodeDriver';
 import { loadPacks } from '../data/loadPacks';
@@ -20,6 +21,17 @@ import { ensureBaby } from '../domain/repositories/babies';
  */
 
 const DATE = '2026-03-10';
+
+/** Mirrors backup.ts's canonical JSON so the v1 payload can be re-signed here. */
+function canonicalForTest(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null';
+  if (Array.isArray(value)) return `[${value.map(canonicalForTest).join(',')}]`;
+  const obj = value as Record<string, unknown>;
+  return `{${Object.keys(obj)
+    .sort()
+    .map((k) => `${JSON.stringify(k)}:${canonicalForTest(obj[k])}`)
+    .join(',')}}`;
+}
 
 function setup() {
   const { db, baby: raw } = freshDb();
@@ -372,5 +384,181 @@ describe('migration safety', () => {
     expect(rows[0].id).toBe('inv_old');
     expect(rows[0].qty_note).toBe('半根');
     expect(rows[0].baby_id).toBeTruthy();
+  });
+});
+
+/**
+ * Round 2. The first round of fixes introduced these; each test below fails
+ * against commit b18b607.
+ */
+describe('round 2 regressions', () => {
+  // N-2: demo content could be planned, and from there recorded as a real
+  // feeding, while the UI told the caregiver it could not.
+  it('refuses to put synthetic demo content into a real plan', () => {
+    const { db, baby } = setup();
+    const slot = createSlot(db, baby.id, DATE, '演示餐', '10:00');
+    const demoRecipe = db.get<{ id: string }>(
+      'SELECT id FROM recipes WHERE is_synthetic = 1 LIMIT 1'
+    );
+    const demoIngredient = db.get<{ id: string }>(
+      'SELECT id FROM ingredients WHERE is_synthetic = 1 LIMIT 1'
+    );
+    expect(demoRecipe).toBeTruthy();
+    expect(demoIngredient).toBeTruthy();
+
+    expect(() => addPlanItem(db, slot.id, { recipe_id: demoRecipe!.id })).toThrow(
+      SyntheticContentError
+    );
+    expect(() => addPlanItem(db, slot.id, { ingredient_id: demoIngredient!.id })).toThrow(
+      SyntheticContentError
+    );
+
+    // Nothing reached the plan, so nothing can reach a feeding record.
+    const items = db.all('SELECT * FROM plan_items WHERE meal_slot_id = ?', [slot.id]);
+    expect(items).toHaveLength(0);
+  });
+
+  it('still allows real content into a plan', () => {
+    const { db, slot } = setup();
+    const real = db.get<{ id: string }>('SELECT id FROM recipes WHERE is_synthetic = 0 LIMIT 1')!;
+    expect(() => addPlanItem(db, slot.id, { recipe_id: real.id })).not.toThrow();
+  });
+
+  // N-3: the inventory search returned synthetic rows, which then fed
+  // recommendations as if the caregiver really had that food at home.
+  it('keeps synthetic rows out of the inventory picker query', () => {
+    const { db } = setup();
+    const unfiltered = db.all<{ id: string }>(
+      'SELECT * FROM ingredients WHERE name_zh LIKE ? LIMIT 12',
+      ['%演示%']
+    );
+    const filtered = db.all<{ id: string }>(
+      'SELECT * FROM ingredients WHERE name_zh LIKE ? AND is_synthetic = 0 LIMIT 12',
+      ['%演示%']
+    );
+    expect(unfiltered.length).toBeGreaterThan(0); // the rows do exist
+    expect(filtered).toHaveLength(0); // but the screen's query excludes them
+  });
+
+  // N-5: bumping the checksum payload made every previously-written backup
+  // fail verification and be reported to the caregiver as corrupt.
+  it('still accepts and upgrades a v1 backup instead of calling it corrupt', () => {
+    const { db, baby } = setup();
+    db.run(
+      "INSERT INTO inventory_items (id, baby_id, ingredient_id, free_text, qty_note, created_at, updated_at, status) VALUES (?,?,?,?,?,?,?,'active')",
+      ['inv_v1', baby.id, null, '米粉', '一袋', '2026-03-01T00:00:00.000Z', '2026-03-01T00:00:00.000Z']
+    );
+
+    const current = exportBackup(db, '1.0.0');
+
+    // Rebuild the file as the previous build would have written it: format
+    // version 1, no pack_versions in the signed payload, and inventory rows
+    // without baby_id.
+    const legacyTables = {
+      ...current.tables,
+      inventory_items: (current.tables.inventory_items ?? []).map((row) => {
+        const { baby_id: _baby, created_at: _created, ...rest } = row as Record<string, unknown>;
+        return rest;
+      }),
+    };
+    const legacy = {
+      format: current.format,
+      format_version: 1,
+      schema_version: current.schema_version,
+      app_version: current.app_version,
+      exported_at: current.exported_at,
+      row_counts: current.row_counts,
+      tables: legacyTables,
+    };
+    const checksum = sha256Hex(
+      canonicalForTest({
+        format: legacy.format,
+        format_version: legacy.format_version,
+        schema_version: legacy.schema_version,
+        app_version: legacy.app_version,
+        exported_at: legacy.exported_at,
+        row_counts: legacy.row_counts,
+        tables: legacy.tables,
+      })
+    );
+    const text = JSON.stringify({ ...legacy, checksum });
+
+    // Previously this threw BackupRejected('checksum_mismatch').
+    expect(() => inspectBackup(text)).not.toThrow();
+
+    const report = restoreBackup(db, text);
+    expect(report.restored.inventory_items).toBe(1);
+    const restored = db.get<{ baby_id: string; free_text: string }>(
+      "SELECT baby_id, free_text FROM inventory_items WHERE id = 'inv_v1'"
+    )!;
+    expect(restored.free_text).toBe('米粉');
+    expect(restored.baby_id).toBe(baby.id); // owner adopted from the backup
+  });
+
+  it('still rejects a genuinely tampered current-format backup', () => {
+    const { db } = setup();
+    const file = exportBackup(db, '1.0.0');
+    const parsed = JSON.parse(serialiseBackup(file));
+    parsed.pack_versions = { tampered: 'yes' };
+    let reason: string | null = null;
+    try {
+      inspectBackup(JSON.stringify(parsed));
+    } catch (e) {
+      reason = e instanceof BackupRejected ? e.reason : 'other';
+    }
+    expect(reason).toBe('checksum_mismatch');
+  });
+
+  // N-7: a row claiming mode 'ratio' with a NULL ratio was read as a known
+  // zero, silently converting an unknown into "the baby ate none of it".
+  // recordFeeding rejects it, but a restored file can still contain it.
+  it('treats a missing portion figure as unknown, not as a confirmed zero', () => {
+    const { db, baby, slot } = setup();
+    const carrot = db.get<{ id: string }>("SELECT id FROM ingredients WHERE name_zh LIKE '胡萝卜%'")!;
+    addPlanItem(db, slot.id, { ingredient_id: carrot.id });
+    const snapshot = snapshotFromSlot(db, slot.id);
+    recordFeeding(db, {
+      babyId: baby.id,
+      mealSlotId: slot.id,
+      mealLabel: '午餐',
+      occurredAt: new Date(`${DATE}T04:00:00.000Z`),
+      timezone: TZ,
+      snapshot,
+      intakeMode: 'ratio',
+      intakeRatio: 0.5,
+      intakeAmountG: null,
+    });
+    // Corrupt the stored row the way a foreign backup could.
+    db.run('UPDATE feeding_events SET intake_ratio = NULL');
+
+    const { food } = daySummary(db, baby.id, DATE);
+    expect(food.offered_not_eaten_ingredient_ids).not.toContain(carrot.id);
+    expect(food.eaten_ingredient_ids).not.toContain(carrot.id);
+    expect(food.offered_unknown_ingredient_ids).toContain(carrot.id);
+  });
+
+  // N-8: migration v2 silently deleted inventory rows when no baby existed.
+  // Losing caregiver data inside a migration must fail loudly instead.
+  it('aborts rather than silently dropping inventory rows it cannot attribute', () => {
+    const db = createNodeDriver(':memory:');
+    db.exec(
+      'CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)',
+    );
+    db.exec(MIGRATIONS[0].sql);
+    db.run('INSERT INTO schema_migrations (version, name, applied_at) VALUES (?,?,?)', [
+      MIGRATIONS[0].version,
+      MIGRATIONS[0].name,
+      '2026-03-10T00:00:00Z',
+    ]);
+    loadPacks(db);
+    const anyIngredient = db.get<{ id: string }>('SELECT id FROM ingredients LIMIT 1')!;
+    db.run(
+      "INSERT INTO inventory_items (id, ingredient_id, qty_note, updated_at, status) VALUES ('orphan', ?, '一包', '2026-03-01T00:00:00.000Z', 'active')",
+      [anyIngredient.id]
+    );
+    // No baby row exists, so there is no owner to carry the item to.
+    expect(() => migrate(db)).toThrow();
+    // The pre-migration data is still there; nothing was quietly deleted.
+    expect(db.all('SELECT * FROM inventory_items')).toHaveLength(1);
   });
 });

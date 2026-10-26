@@ -17,13 +17,19 @@ import {
 import { listFeedings, recordFeeding, FeedingValidationError } from '../../domain/repositories/feeding';
 import { undoFact } from '../../domain/repositories/facts';
 import { daySummary } from '../../domain/summary';
-import { ageInMonths, shiftLocalDate, formatLocalDate } from '../../domain/time';
+import { ageInMonths, daysBetweenLocalDates, shiftLocalDate, formatLocalDate } from '../../domain/time';
 import { IntakeMode, INTAKE_MODE_LABELS } from '../../domain/types';
 import { OccurredAtField, useOccurredAt } from '../OccurredAt';
 
 export function TodayScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
-  const { db, baby, today, refresh, revision } = useApp();
-  const [date, setDate] = useState(today);
+  const { db, baby, today, nowTime, refresh, revision } = useApp();
+  // `offset` rather than an absolute date: the caregiver's intent is "the day I
+  // am looking at relative to today". Storing the absolute date would strand
+  // the screen on yesterday when the app is left open across local midnight,
+  // which is exactly where new records would then be filed.
+  const [offset, setOffset] = useState(0);
+  const date = useMemo(() => shiftLocalDate(today, offset), [today, offset]);
+  const setDate = (next: string) => setOffset(daysBetweenLocalDates(today, next));
   const [slotEditor, setSlotEditor] = useState(false);
   const [feedingFor, setFeedingFor] = useState<MealSlotView | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -276,13 +282,22 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
         }}
       />
 
-      <FeedingModal
-        slot={feedingFor}
-        tz={baby.timezone}
-        today={today}
-        date={date}
-        onClose={() => setFeedingFor(null)}
-        onSubmit={(mode, ratio, grams, occurredAt) => {
+      {/*
+        Keyed and conditionally mounted so each open starts from a clean form.
+        A permanently-mounted modal carries the previous slot's intake mode,
+        ratio and grams into the next meal, and seeds its occurrence time at
+        screen-mount rather than at open.
+      */}
+      {feedingFor ? (
+        <FeedingModal
+          key={`${feedingFor.id}:${date}`}
+          slot={feedingFor}
+          tz={baby.timezone}
+          today={today}
+          date={date}
+          nowTime={nowTime}
+          onClose={() => setFeedingFor(null)}
+          onSubmit={(mode, ratio, grams, occurredAt) => {
           try {
             const snapshot = snapshotFromSlot(db, feedingFor!.id);
             recordFeeding(db, {
@@ -303,7 +318,8 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
             setFeedingFor(null);
           }
         }}
-      />
+        />
+      ) : null}
       <SectionHeader title="资料与设置" />
       <Card>
         <Row style={{ flexWrap: 'wrap' }}>
@@ -405,6 +421,7 @@ function FeedingModal({
   tz,
   today,
   date,
+  nowTime,
   onClose,
   onSubmit,
 }: {
@@ -412,14 +429,16 @@ function FeedingModal({
   tz: string;
   today: string;
   date: string;
+  nowTime: string;
   onClose: () => void;
   onSubmit: (mode: IntakeMode, ratio: number | null, grams: number | null, occurredAt: Date) => void;
 }) {
   const [mode, setMode] = useState<IntakeMode>('unknown');
   const [ratio, setRatio] = useState<number | null>(null);
   const [grams, setGrams] = useState('');
-  // Stamped onto the day the caregiver is actually looking at, not "now".
-  const [when, setWhenDate, setWhenTime] = useOccurredAt(tz, date);
+  // Stamped onto the day the caregiver is actually looking at, not "now", and
+  // the time follows the clock until it is edited.
+  const [when, setWhenDate, setWhenTime] = useOccurredAt(tz, date, nowTime);
 
   if (!slot) return null;
   const gramsValue = grams.trim() === '' ? null : Number(grams);
