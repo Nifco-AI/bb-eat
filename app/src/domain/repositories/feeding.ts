@@ -1,3 +1,4 @@
+import { assertNotSynthetic } from './synthetic';
 import { SqlDriver } from '../../db/driver';
 import { newId, opIdFor } from '../ids';
 import { stampFor } from '../time';
@@ -56,6 +57,12 @@ function validate(input: RecordFeedingInput): void {
  */
 export function recordFeeding(db: SqlDriver, input: RecordFeedingInput): FeedingEvent {
   validate(input);
+  // The snapshot is what the day summary later reads back as "actually eaten",
+  // so it is the last place fabricated content could become a real fact.
+  for (const item of input.snapshot.items) {
+    assertNotSynthetic(db, 'ingredients', item.ingredient_id);
+    assertNotSynthetic(db, 'recipes', item.recipe_id);
+  }
   const stamp = stampFor(input.occurredAt, input.timezone);
   const opId =
     input.opId ??

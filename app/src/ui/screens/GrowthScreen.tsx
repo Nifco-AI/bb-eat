@@ -158,13 +158,16 @@ export function GrowthScreen({ navigation }: { navigation: { navigate: (s: strin
           label={busy ? '保存中…' : '保存测量'}
           disabled={value.trim() === '' || busy || !when.valid}
           onPress={() => {
-            if (submittingRef.current || busy) return;
-            submittingRef.current = true;
             setError(null);
             if (!when.valid) {
               setError('请先把测量时间填写成 24 小时制的 时:分。');
               return;
             }
+            // Claim the guard only once the submission is actually going
+            // ahead; an early return before the try/finally would otherwise
+            // leave the ref latched and kill the button for good.
+            if (submittingRef.current || busy) return;
+            submittingRef.current = true;
             setBusy(true);
             try {
               recordGrowth(db, {

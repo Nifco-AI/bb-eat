@@ -170,7 +170,15 @@ export function daySummary(db: SqlDriver, babyId: string, localDate: string): Da
       `${unknownLiquid.map((l) => l.label).join('、')}有 ${unknownLiquid.reduce((a, l) => a + l.unknown_events, 0)} 次未记录数量，合计 mL 只是已知部分的下限。`,
     );
   }
-  const unknownIntake = feedings.filter((f) => f.intake_mode === 'unknown').length;
+  // A row whose mode promises a figure but stores NULL is just as unknown as
+  // mode 'unknown'. Counting only the latter made this counter disagree with
+  // the ingredient lists, which already treat both as unknown.
+  const unknownIntake = feedings.filter(
+    (f) =>
+      f.intake_mode === 'unknown' ||
+      (f.intake_mode === 'ratio' && f.intake_ratio === null) ||
+      (f.intake_mode === 'absolute' && f.intake_amount_g === null),
+  ).length;
   if (unknownIntake > 0) notes.push(`${unknownIntake} 次喂食未记录吃下多少，未计入「已吃」判断。`);
   if (unknown.size > 0) notes.push(`${unknown.size} 种食材只知道已提供，是否吃下未知。`);
   if (planned_slots > slots_with_feeding) {

@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { AppProvider } from './src/ui/AppProvider';
 import { ErrorState, LoadingState } from './src/ui/components';
 import { ErrorBoundary } from './src/ui/ErrorBoundary';
@@ -162,6 +164,71 @@ function Shell() {
   );
 }
 
+
+/**
+ * A failed boot is the one screen a caregiver cannot navigate away from, so a
+ * bare "retry" button is not enough: a migration that aborts to protect data
+ * (see migrations.ts v2) fails identically on every retry, and the only
+ * remaining remedy would be clearing app storage, which destroys exactly the
+ * data the abort was protecting. This offers to copy the raw SQLite file out
+ * first, so the records survive even when the app cannot open them.
+ */
+function BootFailure({ message, retry }: { message: string; retry: () => void }) {
+  const [status, setStatus] = useState<string | null>(null);
+
+  const rescue = async () => {
+    setStatus('正在导出…');
+    try {
+      const source = new File(Paths.document, 'SQLite', 'bbeat.db');
+      if (!source.exists) {
+        setStatus('没有找到数据库文件，可能还没有产生任何记录。');
+        return;
+      }
+      const target = new File(Paths.cache, `bbeat-rescue-${Date.now()}.db`);
+      source.copy(target);
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(target.uri, {
+          mimeType: 'application/octet-stream',
+          dialogTitle: '导出 BB-Eat 原始数据库',
+        });
+        setStatus('已导出原始数据库文件。请妥善保存后再考虑清除应用数据。');
+      } else {
+        setStatus(`已复制到：${target.uri}`);
+      }
+    } catch (e) {
+      setStatus(`导出失败：${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 16 }}>
+      <Text style={[typography.title, { marginBottom: 12 }]}>无法打开本地数据库</Text>
+      <ErrorState detail={message} onRetry={retry} />
+      <Text style={[typography.body, { marginTop: 16, color: colors.textMuted }]}>
+        如果重试一直失败，先把原始数据库文件导出保存，再联系支持或清除应用数据。清除应用数据会删除全部记录。
+      </Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={rescue}
+        style={{
+          minHeight: MIN_TOUCH,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 12,
+          borderRadius: 12,
+          borderWidth: 1,
+          borderColor: colors.border,
+        }}
+      >
+        <Text style={typography.body}>导出原始数据库文件</Text>
+      </Pressable>
+      {status ? (
+        <Text style={[typography.caption, { marginTop: 10, color: colors.textMuted }]}>{status}</Text>
+      ) : null}
+    </View>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
@@ -172,12 +239,7 @@ export default function App() {
             <LoadingState label="正在准备本地数据…" />
           </View>
         )}
-        renderError={(message, retry) => (
-          <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', padding: 16 }}>
-            <Text style={[typography.title, { marginBottom: 12 }]}>无法打开本地数据库</Text>
-            <ErrorState detail={message} onRetry={retry} />
-          </View>
-        )}
+        renderError={(message, retry) => <BootFailure message={message} retry={retry} />}
       >
         <NavigationContainer theme={navTheme}>
           <Shell />

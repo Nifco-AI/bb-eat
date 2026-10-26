@@ -59,6 +59,17 @@ const out = {
     ).length,
     registered_sources: sources.length,
   },
+  // Section 6 asks for the number of entries that CANNOT be recommended and
+  // why. The app gates the whole recommender on there being at least one
+  // expert-reviewed recipe, so with none, every real recipe is unrecommendable.
+  // Computed here rather than asserted, so the report cannot drift from the
+  // rule in recommend.ts.
+  recommendability: {
+    real_recipes: recipes.length,
+    expert_reviewed_recipes: recipes.filter((r) => r.review_status === 'expert_reviewed').length,
+    not_auto_recommendable: recipes.filter((r) => r.review_status !== 'expert_reviewed').length,
+    blocking_reason: 'no_expert_reviewed_recipes',
+  },
 };
 
 console.log(JSON.stringify(out, null, 2));
@@ -69,6 +80,10 @@ const invariants = [
   ['no ingredient carries a min_age threshold', out.age_evidence.ingredients_with_min_age === 0],
   ['no recipe carries a min_age threshold', out.age_evidence.recipes_with_min_age === 0],
   ['every recipe ingredient reference resolves', dangling.length === 0],
+  [
+    'section 6 reports every real recipe as non-auto-recommendable',
+    out.recommendability.not_auto_recommendable === out.recommendability.real_recipes,
+  ],
 ];
 const broken = invariants.filter(([, ok]) => !ok).map(([label]) => label);
 if (broken.length > 0) {

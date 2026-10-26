@@ -4,7 +4,7 @@ import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ListTile, Row, Screen, SectionHeader } from '../components';
 import { colors, MIN_TOUCH, radius, spacing, typography } from '../theme';
 import { addPlanItem } from '../../domain/repositories/meals';
-import { newId } from '../../domain/ids';
+import { addAvoidItem, addInventoryItem, removeAvoidItem, removeInventoryItem, searchInventoryCandidates } from '../../domain/repositories/inventory';
 import {
   CHOKING_LABELS,
   FOOD_GROUP_LABELS,
@@ -130,20 +130,8 @@ export function IngredientsScreen({
                     label={avoidIds.has(i.id) ? '取消回避' : '回避'}
                     variant={avoidIds.has(i.id) ? 'secondary' : 'danger'}
                     onPress={() => {
-                      if (avoidIds.has(i.id)) {
-                        db.run("UPDATE avoid_list SET status = 'removed' WHERE baby_id = ? AND ingredient_id = ?", [
-                          baby.id,
-                          i.id,
-                        ]);
-                      } else {
-                        db.run(
-                          `INSERT INTO avoid_list (id, baby_id, ingredient_id, reason, created_at, status)
-                           VALUES (?,?,?,?,?,'active')
-                           ON CONFLICT (baby_id, ingredient_id)
-                           DO UPDATE SET status = 'active', created_at = excluded.created_at`,
-                          [newId('avoid'), baby.id, i.id, null, new Date().toISOString()],
-                        );
-                      }
+                      if (avoidIds.has(i.id)) removeAvoidItem(db, baby.id, i.id);
+                      else addAvoidItem(db, baby.id, i.id);
                       refresh();
                     }}
                   />
@@ -347,12 +335,7 @@ export function InventoryScreen() {
   const matches = useMemo(() => {
     const q = query.trim();
     if (!q) return [];
-    return db.all<Ingredient>(
-      // Synthetic demo rows must never become inventory: inventory feeds
-      // `recommend()` and the day summary, both of which are real records.
-      'SELECT * FROM ingredients WHERE name_zh LIKE ? AND is_synthetic = 0 LIMIT 12',
-      [`%${q}%`]
-    );
+    return searchInventoryCandidates(db, q) as unknown as Ingredient[];
   }, [db, query]);
 
   return (
@@ -388,18 +371,7 @@ export function InventoryScreen() {
               <Button
                 label="加入"
                 onPress={() => {
-                  db.run(
-                    `INSERT INTO inventory_items (id, baby_id, ingredient_id, free_text, created_at, updated_at, status)
-                     VALUES (?,?,?,?,?,?, 'active')`,
-                    [
-                      `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-                      baby.id,
-                      m.id,
-                      null,
-                      new Date().toISOString(),
-                      new Date().toISOString(),
-                    ],
-                  );
+                  addInventoryItem(db, baby.id, { ingredientId: m.id });
                   setQuery('');
                   refresh();
                 }}
@@ -423,7 +395,7 @@ export function InventoryScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`移除 ${o.name_zh ?? o.free_text}`}
                   onPress={() => {
-                    db.run("UPDATE inventory_items SET status = 'removed' WHERE id = ?", [o.id]);
+                    removeInventoryItem(db, o.id);
                     refresh();
                   }}
                   style={{ minHeight: MIN_TOUCH, minWidth: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' }}

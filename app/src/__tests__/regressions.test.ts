@@ -11,6 +11,12 @@ import { MIGRATIONS, migrate } from '../db/migrations';
 import { createNodeDriver } from '../db/nodeDriver';
 import { loadPacks } from '../data/loadPacks';
 import { ensureBaby } from '../domain/repositories/babies';
+import {
+  addAvoidItem,
+  addInventoryItem,
+  searchInventoryCandidates,
+} from '../domain/repositories/inventory';
+
 
 /**
  * Regression tests for defects found by the independent verifier.
@@ -426,18 +432,16 @@ describe('round 2 regressions', () => {
 
   // N-3: the inventory search returned synthetic rows, which then fed
   // recommendations as if the caregiver really had that food at home.
-  it('keeps synthetic rows out of the inventory picker query', () => {
+  it('keeps synthetic rows out of the inventory picker by running the real query', () => {
     const { db } = setup();
     const unfiltered = db.all<{ id: string }>(
       'SELECT * FROM ingredients WHERE name_zh LIKE ? LIMIT 12',
       ['%演示%']
     );
-    const filtered = db.all<{ id: string }>(
-      'SELECT * FROM ingredients WHERE name_zh LIKE ? AND is_synthetic = 0 LIMIT 12',
-      ['%演示%']
-    );
-    expect(unfiltered.length).toBeGreaterThan(0); // the rows do exist
-    expect(filtered).toHaveLength(0); // but the screen's query excludes them
+    expect(unfiltered.length).toBeGreaterThan(0); // the synthetic rows do exist
+    // Exercises the function the screen actually calls, not a retyped copy of
+    // its SQL, so moving or breaking that query fails this test.
+    expect(searchInventoryCandidates(db, '演示')).toHaveLength(0);
   });
 
   // N-5: bumping the checksum payload made every previously-written backup
@@ -561,4 +565,95 @@ describe('round 2 regressions', () => {
     // The pre-migration data is still there; nothing was quietly deleted.
     expect(db.all('SELECT * FROM inventory_items')).toHaveLength(1);
   });
+
+  // N-15: the synthetic guard was applied only in addPlanItem, so every other
+  // write path could still attach demo content to a real record. These probes
+  // are the ones the verifier used to get fabricated food into a day summary.
+  describe('round 3: synthetic content is blocked at every write path', () => {
+    const syntheticId = (db: ReturnType<typeof setup>['db']) =>
+      db.get<{ id: string }>('SELECT id FROM ingredients WHERE is_synthetic = 1 LIMIT 1')!.id;
+
+    it('refuses a synthetic ingredient in a served snapshot', () => {
+      const { db, baby } = setup();
+      const id = syntheticId(db);
+      expect(() =>
+        recordFeeding(db, {
+          babyId: baby.id,
+          mealSlotId: null,
+          mealLabel: '午餐',
+          occurredAt: new Date('2026-05-01T04:00:00.000Z'),
+          timezone: 'Asia/Shanghai',
+          snapshot: {
+            items: [
+              {
+                ingredient_id: id,
+                free_text: null,
+                label: '演示',
+                recipe_id: null,
+                amount_g: 50,
+                amount_unknown: false,
+              },
+            ],
+            recipe_ids: [],
+            recipe_versions: {},
+            pack_versions: {},
+            captured_at: '2026-05-01T04:00:00.000Z',
+          },
+          intakeMode: 'ratio',
+          intakeRatio: 0.5,
+          intakeAmountG: null,
+        })
+      ).toThrow(SyntheticContentError);
+      expect(db.all('SELECT * FROM feeding_events')).toHaveLength(0);
+    });
+
+    it('refuses a synthetic ingredient in an exposure and a suspicion', () => {
+      const { db, baby } = setup();
+      const id = syntheticId(db);
+      const when = new Date('2026-05-01T04:00:00.000Z');
+      expect(() =>
+        recordExposure(db, {
+          babyId: baby.id,
+          ingredientId: id,
+          freeText: null,
+          amountG: null,
+          occurredAt: when,
+          timezone: 'Asia/Shanghai',
+        })
+      ).toThrow(SyntheticContentError);
+      expect(() =>
+        recordSuspicion(db, {
+          babyId: baby.id,
+          ingredientId: id,
+          freeText: null,
+          rationale: '出疹子',
+          occurredAt: when,
+          timezone: 'Asia/Shanghai',
+        })
+      ).toThrow(SyntheticContentError);
+      expect(db.all('SELECT * FROM exposure_events')).toHaveLength(0);
+      expect(db.all('SELECT * FROM caregiver_suspicions')).toHaveLength(0);
+    });
+
+    it('refuses a synthetic ingredient in inventory and the avoid list', () => {
+      const { db, baby } = setup();
+      const id = syntheticId(db);
+      expect(() => addInventoryItem(db, baby.id, { ingredientId: id })).toThrow(
+        SyntheticContentError
+      );
+      expect(() => addAvoidItem(db, baby.id, id)).toThrow(SyntheticContentError);
+      expect(db.all("SELECT * FROM inventory_items WHERE status = 'active'")).toHaveLength(0);
+      expect(db.all("SELECT * FROM avoid_list WHERE status = 'active'")).toHaveLength(0);
+    });
+
+    it('still accepts a real ingredient on those same paths', () => {
+      const { db, baby } = setup();
+      const real = db.get<{ id: string }>(
+        'SELECT id FROM ingredients WHERE is_synthetic = 0 LIMIT 1'
+      )!.id;
+      expect(() => addInventoryItem(db, baby.id, { ingredientId: real })).not.toThrow();
+      expect(() => addAvoidItem(db, baby.id, real)).not.toThrow();
+    });
+  });
+
 });

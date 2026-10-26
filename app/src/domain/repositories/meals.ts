@@ -1,3 +1,4 @@
+import { assertNotSynthetic } from './synthetic';
 import { SqlDriver } from '../../db/driver';
 import { newId } from '../ids';
 import { MealSlot, PlanItem, Recipe, ServedSnapshot, ServedSnapshotItem } from '../types';
@@ -89,25 +90,6 @@ export function removeSlot(db: SqlDriver, slotId: string): void {
     ]);
     db.run("UPDATE plan_items SET status = 'removed' WHERE meal_slot_id = ?", [slotId]);
   });
-}
-
-export class SyntheticContentError extends Error {
-  constructor(public readonly table: 'recipes' | 'ingredients', public readonly rowId: string) {
-    super('演示用的合成内容不能加入真实的计划或记录。');
-    this.name = 'SyntheticContentError';
-  }
-}
-
-/**
- * Fail-closed guard: synthetic demo rows exist only to show the interface when
- * there is nothing real to show. They carry no evidence, so letting one reach a
- * plan item would put fabricated content into a caregiver's real feeding
- * history and day summary.
- */
-function assertNotSynthetic(db: SqlDriver, table: 'recipes' | 'ingredients', rowId: string | null): void {
-  if (!rowId) return;
-  const row = db.get<{ is_synthetic: number }>(`SELECT is_synthetic FROM ${table} WHERE id = ?`, [rowId]);
-  if (row && row.is_synthetic) throw new SyntheticContentError(table, rowId);
 }
 
 export function addPlanItem(
@@ -219,3 +201,5 @@ export function snapshotFromSlot(db: SqlDriver, slotId: string): ServedSnapshot 
     captured_at: new Date().toISOString(),
   };
 }
+
+export { SyntheticContentError } from './synthetic';

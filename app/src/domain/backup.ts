@@ -72,7 +72,8 @@ export type RejectReason =
   | 'checksum_mismatch'
   | 'tables_missing'
   | 'row_count_mismatch'
-  | 'unknown_table';
+  | 'unknown_table'
+  | 'legacy_inventory_unattributable';
 
 export const REJECT_MESSAGES: Record<RejectReason, string> = {
   not_json: '文件不是有效的 JSON，无法读取。原有数据未改动。',
@@ -80,10 +81,14 @@ export const REJECT_MESSAGES: Record<RejectReason, string> = {
   format_version_unsupported: '备份文件版本高于当前应用支持的版本，请先升级应用。原有数据未改动。',
   schema_version_newer: '备份来自更新版本的应用，当前版本无法安全读取。原有数据未改动。',
   checksum_missing: '备份文件缺少校验值，无法确认完整性。原有数据未改动。',
-  checksum_mismatch: '备份文件校验失败，可能已损坏或被修改。原有数据未改动。',
+  // Deliberately does not claim to detect tampering: the checksum can be
+  // recomputed by anyone who edits the file.
+  checksum_mismatch: '备份文件校验失败，内容与其自身的校验值对不上（通常是文件损坏或传输不完整）。原有数据未改动。',
   tables_missing: '备份文件结构不完整，缺少必要的数据表。原有数据未改动。',
   row_count_mismatch: '备份文件内容与其自身记录的条数不一致，可能已被截断。原有数据未改动。',
   unknown_table: '备份文件包含当前版本无法识别的数据表。原有数据未改动。',
+  legacy_inventory_unattributable:
+    '这是旧版本的备份，其中的库存条目没有记录属于哪个宝宝，而文件里不是正好一个宝宝，无法确定归属。原有数据未改动。',
 };
 
 export class BackupRejected extends Error {
@@ -108,11 +113,17 @@ function canonical(value: unknown): string {
 }
 
 function payloadFor(file: Omit<BackupFile, 'checksum'>): string {
-  // Every field of the file is covered, so no part of a backup can be edited
-  // without invalidating the checksum. v1 files were written before
+  // This is a checksum, not a signature: it detects accidental truncation and
+  // corruption, but anyone who edits a file can recompute it, so a deliberate
+  // forgery is NOT detectable. Do not describe it to the caregiver as proof
+  // that a file is unmodified.
+  //
+  // For v2 every field is covered. v1 files were written before
   // `pack_versions` was covered, so they must be verified with the payload
   // shape that was actually signed — otherwise an intact old backup is
-  // misreported as corrupt.
+  // misreported as corrupt. The consequence is that `pack_versions` in a v1
+  // file is unverified; `inspectBackup` therefore must not present a v1 file's
+  // pack versions as checked.
   const legacy = file.format_version < 2;
   return canonical({
     format: file.format,
@@ -253,7 +264,11 @@ function upgradeRow(
 ): Record<string, unknown> {
   if (file.format_version >= 2 || table !== 'inventory_items' || 'baby_id' in row) return row;
   const babies = file.tables.babies ?? [];
-  if (babies.length !== 1) return row;
+  // v1 inventory rows carried no owner. Adopting the single baby in the file is
+  // unambiguous; with none or several there is no non-guessing answer, so fail
+  // with a reason the caregiver can act on rather than letting a raw NOT NULL
+  // constraint surface as an English SQLite string.
+  if (babies.length !== 1) throw new BackupRejected('legacy_inventory_unattributable');
   return { ...row, baby_id: babies[0].id, created_at: row.created_at ?? row.updated_at ?? null };
 }
 

@@ -72,17 +72,18 @@ export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
   };
 
   const submit = () => {
-    // A ref, not the `busy` state: React batches state updates, so two taps
-    // landing in the same batch would both still observe `busy === false`.
-    // The ref flips synchronously, so the second tap returns immediately.
-    // The UNIQUE client_op_id is the backstop if it ever gets through anyway.
-    if (submittingRef.current || busy) return;
-    submittingRef.current = true;
     setError(null);
     if (!when.valid) {
       setError('请先把发生时间填写成 24 小时制的 时:分，例如 03:20。');
       return;
     }
+    // A ref, not the `busy` state: React batches state updates, so two taps
+    // landing in the same batch would both still observe `busy === false`.
+    // The ref flips synchronously, so the second tap returns immediately.
+    // The UNIQUE client_op_id is the backstop if it ever gets through anyway.
+    // It is claimed only after validation, so an early return cannot latch it.
+    if (submittingRef.current || busy) return;
+    submittingRef.current = true;
     setBusy(true);
     try {
       const now = when.toDate();

@@ -31,7 +31,10 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
   const date = useMemo(() => shiftLocalDate(today, offset), [today, offset]);
   const setDate = (next: string) => setOffset(daysBetweenLocalDates(today, next));
   const [slotEditor, setSlotEditor] = useState(false);
-  const [feedingFor, setFeedingFor] = useState<MealSlotView | null>(null);
+  // The day is captured when the modal opens, not read live. `date` follows the
+  // ticking clock, so keying on it would unmount a modal that happened to be
+  // open at local midnight and silently discard a half-entered night feed.
+  const [feedingFor, setFeedingFor] = useState<{ slot: MealSlotView; date: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { slots, summary, feedings } = useMemo(() => {
@@ -159,7 +162,7 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
                 disabled={slot.items.length === 0}
                 accessibilityHint={slot.items.length === 0 ? '先给这一餐添加食材' : '记录实际吃了多少'}
                 style={{ marginBottom: spacing.sm }}
-                onPress={() => setFeedingFor(slot)}
+                onPress={() => setFeedingFor({ slot, date })}
               />
             </Row>
             <Button
@@ -290,20 +293,20 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
       */}
       {feedingFor ? (
         <FeedingModal
-          key={`${feedingFor.id}:${date}`}
-          slot={feedingFor}
+          key={`${feedingFor.slot.id}:${feedingFor.date}`}
+          slot={feedingFor.slot}
           tz={baby.timezone}
           today={today}
-          date={date}
+          date={feedingFor.date}
           nowTime={nowTime}
           onClose={() => setFeedingFor(null)}
           onSubmit={(mode, ratio, grams, occurredAt) => {
           try {
-            const snapshot = snapshotFromSlot(db, feedingFor!.id);
+            const snapshot = snapshotFromSlot(db, feedingFor!.slot.id);
             recordFeeding(db, {
               babyId: baby.id,
-              mealSlotId: feedingFor!.id,
-              mealLabel: feedingFor!.label,
+              mealSlotId: feedingFor!.slot.id,
+              mealLabel: feedingFor!.slot.label,
               occurredAt,
               timezone: baby.timezone,
               snapshot,

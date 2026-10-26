@@ -1,3 +1,4 @@
+import { AppState as RNAppState } from 'react-native';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { SqlDriver } from '../db/driver';
 import { createExpoDriver } from '../db/expoDriver';
@@ -80,10 +81,21 @@ export function AppProvider({
 
   // An app left open across local midnight must roll over to the new day on
   // its own, otherwise records would keep landing on yesterday.
+  // The interval alone is not enough: Android throttles timers in the
+  // background and stops them entirely under Doze, so a phone woken at 00:0x
+  // could keep stamping records with yesterday's date until the next tick
+  // happened to fire. Recompute immediately whenever the app returns to the
+  // foreground, which is exactly when the caregiver is about to record.
   const [tick, setTick] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setTick((v) => v + 1), 60000);
-    return () => clearInterval(t);
+    const sub = RNAppState.addEventListener('change', (next: string) => {
+      if (next === 'active') setTick((v) => v + 1);
+    });
+    return () => {
+      clearInterval(t);
+      sub.remove();
+    };
   }, []);
 
   const value = useMemo<AppState | null>(() => {

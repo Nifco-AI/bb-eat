@@ -1,3 +1,4 @@
+import { assertNotSynthetic } from './synthetic';
 import { SqlDriver } from '../../db/driver';
 import { newId, opIdFor } from '../ids';
 import { stampFor } from '../time';
@@ -99,6 +100,7 @@ export function recordExposure(db: SqlDriver, input: RecordExposureInput): Expos
   if (input.amountG !== null && (!Number.isFinite(input.amountG) || input.amountG < 0)) {
     throw new FactValidationError('接触量需为 0 或正数');
   }
+  assertNotSynthetic(db, 'ingredients', input.ingredientId);
   const stamp = stampFor(input.occurredAt, input.timezone);
   const opId =
     input.opId ??
@@ -215,6 +217,7 @@ export interface RecordSuspicionInput {
 /** "I suspect X" — a caregiver hypothesis, never a diagnosis. */
 export function recordSuspicion(db: SqlDriver, input: RecordSuspicionInput): { id: string } {
   if (!input.rationale.trim()) throw new FactValidationError('请填写怀疑的理由');
+  assertNotSynthetic(db, 'ingredients', input.ingredientId);
   const stamp = stampFor(input.occurredAt, input.timezone);
   const opId =
     input.opId ?? opIdFor(['suspicion', input.babyId, input.ingredientId ?? input.freeText, stamp.occurred_at]);
