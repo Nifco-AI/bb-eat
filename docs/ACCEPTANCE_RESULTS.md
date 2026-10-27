@@ -1,0 +1,139 @@
+# BB-Eat — 验收结果 / ACCEPTANCE RESULTS
+
+对应 `ACCEPTANCE.md`。被测对象：commit `c4b37f7`，APK SHA-256 `02b784c9…`。
+结果取值只有 **PASS / FAIL / BLOCKED / NOT RUN**，BLOCKED 不计为 PASS。
+
+测试环境：Android 模拟器（`sdk_gphone64_x86_64`，Android 16 / API 36，1080×2400，
+KVM 加速，容器内运行），设备时区 `Etc/UTC`，设备日期 2026-10-26。
+UI 操作通过 `uiautomator` 按控件文本定位驱动，非盲点坐标。
+
+> **没有真机。** ACCEPTANCE §A 第 3 条要求在实际 Android 真机上安装、冷启动、强杀后重启。
+> 本轮不具备真机，该条按规则记为 **BLOCKED**，不记 PASS。下方所有"设备"均指模拟器。
+
+---
+
+## 1. APK 事实
+
+| 项目 | 值 |
+|---|---|
+| 文件 | `app/android/app/build/outputs/apk/release/app-release.apk` |
+| 下载 | https://github.com/Nifco-AI/bb-eat/releases/download/v0.1.1-internal/bb-eat-0.1.1-8d06155.apk （仓库已公开，匿名可下） |
+| SHA-256 | `d5cffc37f64dcabfcc829488e8728ab2b237b65ab7cb0051f9b8e46218715c28` |
+| 大小 | 90,956,379 字节（约 86.7 MiB，universal，含 4 个 ABI） |
+| 包名 | `ai.nifco.bbeat` |
+| 版本 | versionName `0.1.0`，versionCode `1` |
+| minSdk / targetSdk | 24 / 36 |
+| 原生 ABI | `arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64` |
+| Git commit | `8d06155`（含深色主题） |
+| 构建命令 | `npx expo prebuild --platform android --no-install` 然后 `./gradlew assembleRelease` |
+| 构建类型 | 独立 release APK。**不是** .aab，不依赖 Metro，不需要 Expo Go |
+
+验证方式：`aapt dump badging`、`sha256sum`，以及在模拟器上 `adb install -r` 后冷启动。上表 SHA-256 已用**未登录的 `curl`** 从上述公开链接重新下载核对，与本地构建产物逐位一致。
+
+签名：Gradle 默认 debug keystore。可安装、可升级覆盖，但**不可用于正式分发**；更换为独立 upload key 需要用户自己掌管私钥（CONSTRAINTS.md §5）。
+
+---
+
+## 2. U01–U12
+
+| ID | 结果 | 证据与复现步骤 |
+|---|---|---|
+| **U01** 首次打开 | **PASS** | 全新安装（先 `adb uninstall`）后首启，无注册、无账号、无网络请求即可使用。空状态写明"不填写也可以正常记录"。宝宝信息可后补与修改：填入 2025-02-26 / 男 / 新加坡后，顶栏立即显示"20 个月"，且地区切换使地区说明文案实时改变（CN↔SG 分离）。餐次与库存均可独立跳过。<br>截图 `U01-first-run.png`、`U01-baby-profile.png` |
+| **U02** 全天餐单 | **PASS** | 自定义餐次（模板 + 自由命名 + 可空时间，文案明确"不会用来判断是否按时喂养"）。向"午餐"加入 大米、木瓜；可逐项移除；可打开食谱库与食材库选择。今日页按餐次组织，没有"最近记录统计墙"。<br>截图 `U02-2-slot-added.png`、`U02-3-picker.png` |
+| **U03** 真实摄入 | **PASS** | 计划 ≠ 已吃：建立餐次后小结即出现"· 1 餐有计划但还没有实际记录；计划不计为已吃。"。记录一次 50% 后出现"已记录的进食"。随后**从计划中移除 木瓜**，已记录事实仍为"大米、木瓜 · 吃下约 50%"——改计划不改写历史。撤销走二次确认，文案"记录会从统计中移除，但仍保留在历史中可供追溯"；设备数据库中该行为 `status='undone'`（软删除）而非物理删除，`audit_log` 留有 `create`→`undo` 链。<br>截图 `U03-plan-change-no-rewrite.png`、`U03-undo.png` |
+| **U04** 边界数据 | **PASS** | 混合餐（2 种食材）记录"吃下约 50%"后，小结显示 **"吃到的食材：今天还没有确认吃下的食材记录。"** 与 **"· 2 种食材只知道已提供，是否吃下未知。"**——整份比例**没有**被分摊成任何食材的摄入证据。保存前界面即预先说明该规则。奶量"量不详"与已知 120 mL 分列两行，并提示"这里显示的是已知部分的合计，不是全天总量；未知不等于 0"。设备库中 `liquid_events` 该行为 `amount_ml=NULL, amount_unknown=1`，未被写成 0。<br>截图 `U04-3-mixed-warning.png`、`U04-4-summary.png` |
+| **U05** 夜间记录 | **PASS** | 从今日页到保存一次夜奶 = **4 次点击**（FAB → 母乳 → 量不详 → 保存），符合 §D"不超过约 4 次点击"。数量默认空，不预填、不猜测；预设按钮旁注明"快捷按钮只是输入快捷方式，不代表建议喝多少"。发生时间可改为补记，并显示将记入的本地日期与时区。保存后即时回执"已记录一次母乳，量记为不详"。<br>截图 `U05-1-sheet.png`、`U05-3-saved.png` |
+| **U06** 离线/复启 | **PASS** | `cmd connectivity airplane-mode enable`（已确认 `airplane_mode_on=1`）下完成两次记录，其中一次为未知量。**连点测试**：对保存按钮连发两次点击，结果为"配方奶 120 mL 1 次"（非 2 次）。随后 `am force-stop` 强杀并冷启动，两条记录与餐次全部存在。另：以 `adb install -r` 升级安装覆盖后，记录同样完整保留。<br>截图 `U06-2-after-kill.png` |
+| **U07** 接触与异常 | **PARTIAL** | 四类记录（尝到食物／身体情况／我的怀疑／奶水）入口与表单均存在且各自独立，均带发生时间与补记。"我的怀疑"明确声明"应用会原样保存你的怀疑，但不会据此判定过敏，也不会自动回避该食物，除非你在推荐里手动加入回避"——不自动确诊、不建议再挑战，符合要求。**未逐条在设备上执行编辑/撤回**（仅对进食事件验证了撤销与软删除；症状/怀疑的撤回路径只有单元测试覆盖，未做 UI 验证）。家长转述医护意见有数据层 `recordClinicalNote`，**UI 入口本轮未接通**。<br>截图 `13-quick-suspicion.png` |
+| **U08** 成长 | **PASS** | 仅"测量值 + 发生时间"即可录入。输入 11.2 kg 后显示"约处于同月龄同性别的第 42.5 百分位（z = -0.19）"，并注明"依据 WHO 2006 标准（WHO-CGS-2006.r1）。单次测量的位置不代表健康状况"。单点时曲线区显示"还没有记录。记录两次以上才能看到趋势。"——不画伪趋势。体重/身长可切换。未填性别或出生日期时不计算分位（在 `U01-first-run` 状态下已确认）。设备库 `growth_reference` 实载 **4632** 行。<br>截图 `11-growth.png` |
+| **U09** 营养与回顾 | **PARTIAL** | 日小结口径透明且可验证：已吃／只知已提供／未知奶量分列，并给出"合计 mL 只是已知部分的下限"。撤销后小结即时重算（U03 已验证）。**不造热量或营养达标率**——`estimateEnergy()` 对所有输入一律拒绝返回数值。**周／月总结未在本轮 UI 中验证**：`summary.ts` 有周聚合实现与单元测试，但今日页只呈现日视图，周/月回顾界面未交付。 |
+| **U10** 全天推荐 | **PASS** | 真实模式：显示"暂时无法生成推荐"，列出两条独立阻断原因（未填出生日期／内置食谱均未通过外部专业审核），并给出"手动安排今天"与"查看资料来源与审核状态"出口。筛选过程可溯源：内置食谱总数 20 / 通过外部专业审核 0 / 通过硬性安全条件 0。**不足不补齐**。演示模式：整块标注"演示数据…不得作为真实喂养依据"，每个方案带"合成演示"徽标、理由与知识包版本 `2026-10-26.r1`，且加入按钮**被禁用并显示"演示内容不能加入计划"**。<br>截图 `U10-recommend-audit.png`、`U10-demo-plans.png` |
+| **U11** 备份与恢复 | **PASS** | 导出触发系统分享，产出真实文件 `bbeat-backup-2026-10-26.json`（6311 B）。该文件被拉取到设备外，用**独立实现**的规范化 JSON + SHA-256 重算校验值，与文件内值逐字符一致。篡改测试：把 `intake_ratio` 改为 1.0 而不动校验值，设备端恢复被拒，提示"备份文件校验失败…原有数据未改动"，且既有数据确实未变。正常恢复走两层确认（预览：导出时间／版本／13 条记录／日期范围／宝宝，并警告不可撤销），确认后回执"已恢复 13 条记录"，今日页数据完整还原。<br>截图 `U11-tampered-rejected.png`、`U11-restore-confirm.png` |
+| **U12** 视觉体验 | **PARTIAL** | 三主 Tab 统一；层级清晰；暖色克制童趣；无死按钮（禁用态均带说明文字，如"演示内容不能加入计划"）；空状态与失败反馈齐全；主要触控目标 ≥48dp；全部交互控件带中文无障碍标签（本轮 UI 自动化全部依靠这些标签定位，等于反向验证了它们存在且可读）。**对比度：PASS** — 不再是人工抽查，`scripts/contrast.js` 对两套配色各 27 组实际渲染的前景/背景重算 WCAG 比值，浅色最低 5.03:1、深色最低 6.53:1，低于 4.5:1 即由 `data-quality.js` 判定失败。**字体放大 1.3×：PASS**，无截断、无重叠，底部内容可达。**夜间模式：PASS** — 设备上实测：系统切到夜间后界面随即变深**无需重启**；今日页"外观"卡片提供 跟随系统/浅色/深色，手动选深色后 `am force-stop` 重启仍为深色（`app_settings.theme_mode=dark`），改回"跟随系统"且系统为浅色时恢复浅色。快速记录浮层、推荐页、成长页均已随主题变化，深色下奶量仍不预填。**屏幕阅读器（TalkBack）实测：NOT RUN**。<br>截图 `U12-font-scale-130.png`、`U12-theme-1-system-light.png`、`U12-theme-2-system-dark.png`、`U12-theme-3-manual-dark-persists.png`、`U12-theme-4-back-to-system.png`、`U12-theme-5-quick-record-dark.png`、`U12-theme-6-recommend-dark.png`、`U12-theme-7-growth-dark.png` |
+
+**U01–U12 合计：PASS 8 / PARTIAL 3 / FAIL 0。** U12 仍记为 PARTIAL，唯一未完成项是 TalkBack 未实测（NOT RUN），不是失败。
+
+---
+
+## 3. §A 真正可安装与可靠存储
+
+| 条目 | 结果 | 说明 |
+|---|---|---|
+| 独立 APK，非 .aab/Expo Go/网页壳 | **PASS** | 见上表 1。`adb install` 后可脱离 Metro 冷启动。 |
+| 下载位置／SHA-256／包名／版本／commit／构建命令 | **PASS** | 见上表 1。签名：当前为 Gradle 默认 debug keystore 签名的 release 构建，**密钥未入库**；正式分发需改用独立 upload key（见 §6 待办）。 |
+| 模拟器完整交互自动化 + **真机**安装冷启动强杀 | **BLOCKED** | 模拟器部分已完成（本文件全部证据）。**真机不可得**，按规则记 BLOCKED，不记 PASS。 |
+| 离线可用 | **PASS** | 飞行模式下完成记录、餐单、库存/食谱浏览、成长、查阅内置内容；重启后一致。 |
+| 记录→SQLite→重启→检索→编辑/撤回 真实路径 | **PASS** | 直接从设备拉取 `/data/data/ai.nifco.bbeat/files/SQLite/bbeat.db` 核对：`feeding_events.status='undone'`、`liquid_events.amount_ml=NULL/amount_unknown=1`、`audit_log` 的 create→undo 链、`growth_reference` 4632 行、`ingredients` 52 行、`recipes` 26 行。无内存数组、无 Mock。 |
+| 真实儿童资料的加密/密钥/导出安全前置条件 | **BLOCKED（按设计规避）** | 未做本机加密与系统密钥保护，因此**不主张**可用于真实儿童资料，未宣称 Beta 批准。应用内隐私页如实说明数据仅存本机、无账号、无上传。 |
+
+---
+
+## 4. §C 知识/地区/营养包
+
+| 条目 | 结果 | 说明 |
+|---|---|---|
+| 版本化结构化离线资源，显示来源/条件/审核级别 | **PASS** | 6 个 pack（sources/ingredients/recipes/growth/regions/demo），每条带 `source_id`、`review_status`，UI 逐条显示"未核验"等真实状态。 |
+| 第一手来源搜集与过程记录 | **PARTIAL** | WHO 已完整取得并逐字节校验。`nhc.gov.cn` 返回 HTTP 412（WAF）全文未取到；HealthHub 与中国营养学会受版权限制只记元数据；中国食物成分表无开放数据集。全部如实记录于 `app/docs/DATA_QUALITY.md` §6。 |
+| 每条带「适用月龄」与「证据」字段 | **PASS（字段）/ FAIL（覆盖）** | 字段存在，但 **0/45 食材、0/20 食谱**有月龄证据，一律为 `unknown`。这是诚实留空，不是乱填。质地/切法/熟制/安全隐患字段存在，但 40/45 食材窒息风险为 unknown。 |
+| 食谱有来源/关联/做法/过敏原/状态，不整篇转载 | **PASS** | 20 道食谱为本应用自撰，`source_id = bbeat_app`，明示"未经外部专业审核"。未转载任何受限原文。 |
+| CN/SG 分离，WHO 不冒充当地排名 | **PASS** | 地区切换实时改变地区文案；WHO 分位明确标注"WHO 2006 标准"，不称作当地同龄排名。两地"临床内容：不可用（尚未通过独立专业审核）"。 |
+| 负测试 | **PASS** | 单元测试覆盖：月龄未知、食谱无合法复用权、WHO 测量方法不明、生熟/单位不匹配、已记录疑似过敏等，均不输出确定性结论。推荐在真实模式下整体 fail-closed。 |
+| 数据质量报告 | **PASS** | `app/docs/DATA_QUALITY.md`，并由 `app/scripts/data-quality.js` **重算**全部数字，任一不变量被破坏即非零退出。40 食材/20 食谱的探索目标达成（45/20），但**可用性未达成**，报告中如实写明。 |
+| 程序校验 ≠ 医学审核 | **PASS** | 全库 `expert_reviewed` 行数为 **0**，且由数据质量脚本作为硬不变量强制。真实模式下个性化推荐被禁用。 |
+
+---
+
+## 5. §E 工程与独立验证
+
+| 条目 | 结果 | 证据 |
+|---|---|---|
+| typecheck / lint / 单元 / 数据库集成测试 | **PASS** | `tsc --noEmit`（主工程与测试工程）均 0 错；`eslint .` 0 error / 32 warning；`jest` **93 passed / 93**，6 个套件。 |
+| 端到端流程 | **PARTIAL** | 真实设备上的端到端由 `uiautomator` 驱动人工执行并留证（本文件），**但没有自动化 UI 回归测试**——未安装 RN 测试渲染器。 |
+| 迁移/跨日/空值/双击/撤销/重启/非法备份/密钥扫描/非法输入 | **PASS** | 均有单元测试；双击、重启、非法备份、空值另有设备实证。 |
+| 独立 Verifier 自制反例并复检 | **PASS** | 三轮独立验证，见 `docs/VERIFICATION.md`。 |
+| 合成内容隔离并标记 | **PASS** | `assertNotSynthetic()` 在 6 个写入口强制执行，4 个新回归测试证明越过 UI 直接调用仓储层也会被拒。**已知例外：`restoreBackup()` 不复查**，已在数据质量报告中披露。 |
+| 不可得项按 BLOCKED 诚实呈现 | **PASS** | 见 §6。 |
+
+---
+
+## 6. 未完成 / 被阻断 / 已知缺口
+
+**阻断（外部条件不可得，非实现问题）**
+
+1. **真机测试** — 无物理 Android 设备。§A 第 3 条记 BLOCKED。
+2. **外部医学专业审核** — 无合格审核者。因此真实模式下个性化推荐**整体禁用**，全库 `expert_reviewed = 0`。应用从不声称已获医学批准。
+3. **中国国家卫健委指南原文** — `nhc.gov.cn` 持续返回 HTTP 412（WAF 拦截）。
+4. **WHO 2023 补充喂养指南全文** — 未能以可校验形式取得，故无法推导逐条月龄门槛。
+5. **CN/SG 权威内容转载** — 中国营养学会与 HealthHub 均为保留所有权利，仅记录元数据与链接。
+6. **WHO 商用许可** — WHO 生长标准非商业用途可复制并注明出处；**商用需事先书面授权**，属用户的法律判断，不由本轮代为决定。
+
+**已知缺口（实现问题，诚实列出，未以修改验收标准掩盖）**
+
+7. ~~深色/夜间主题未实现~~ **已实现并在设备上验证**（见 U12）。残留限制：主题只有浅/深两套，没有「极暗」或随环境光自动降亮度的档位；系统字体加粗、强制深色（Force Dark）等厂商级开关未逐一验证。
+8. **周/月回顾界面未交付**（U09 PARTIAL）。数据层与测试已就绪，UI 只有日视图。
+9. **医护意见转述无 UI 入口**（U07 PARTIAL）。`recordClinicalNote` 已实现并测试，未接入界面。
+10. **症状/怀疑的编辑与撤回未做 UI 实测**（U07 PARTIAL），仅单元测试覆盖。
+11. **TalkBack 屏幕阅读器未实测**（NOT RUN）。无障碍标签齐备且被自动化反向验证，但未用真实读屏软件走查。
+12. **无自动化 UI 回归测试**。本轮两个最严重的缺陷（表单时间冻结、连点防抖）都只能靠静态审查与手工实测把关。
+13. **迁移 v2 未在设备上对真实 v1 数据运行过**。该路径会在数据不可归属时中止而非删数据，并已提供原始数据库导出通道，但仍属未经实战验证的代码。
+14. **`restoreBackup()` 不复查合成内容**。备份按原样恢复，旧版或手工编辑的备份仍可能带入合成 id。
+15. **签名密钥** — 当前 release 由 Gradle 默认 debug keystore 签名。正式分发前需生成独立 upload key 并妥善保管（密钥不入库）。
+16. **EAS 云构建未取回产物**。本地 Gradle 构建（约 5 分钟）已稳定可复现，EAS 任务耗时过长未等待完成；CI 侧产物缺失不影响 APK 交付，但缺少第三方构建环境的交叉证据。
+
+---
+
+## 7. 复现方法
+
+```bash
+git clone https://github.com/Nifco-AI/bb-eat && cd bb-eat/app
+npm install
+npx tsc --noEmit && npx tsc --noEmit -p tsconfig.test.json
+npx eslint .
+npx jest
+node scripts/data-quality.js          # 重算数据质量报告中的每个数字
+
+export JAVA_HOME=/path/to/jdk-17 ANDROID_HOME=/path/to/android-sdk
+npx expo prebuild --platform android --no-install
+cd android && ./gradlew assembleRelease
+# -> app/build/outputs/apk/release/app-release.apk
+```

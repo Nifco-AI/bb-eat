@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "BB-Eat",
+    "slug": "bb-eat",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "ai.nifco.bbeat",
+      "versionCode": 1
+    },
+    "scheme": "bbeat",
+    "platforms": [
+      "android"
+    ],
+    "plugins": [
+      "expo-sqlite",
+      "expo-sharing"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a28cbfcb-187e-4b88-b549-a97fb57c84bb"
+      }
+    },
+    "owner": "nifco-ai"
+  }
+}

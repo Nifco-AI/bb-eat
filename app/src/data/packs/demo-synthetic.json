@@ -1,0 +1,23 @@
+{
+  "pack_id": "demo-synthetic",
+  "kind": "demo",
+  "version": "2026-10-26.r1",
+  "WARNING": "合成演示数据。这些食材与食谱是为了演示推荐界面而虚构的，其月龄、风险分级与依据全部不真实，任何情况下都不得作为喂养、营养或医学建议。",
+  "ingredients": [
+    { "id": "demo_ing_a", "name_zh": "演示食材·甲（谷物）", "name_en": "Demo grain A", "food_group": "grain", "min_age_months": 6, "choking_risk": "low" },
+    { "id": "demo_ing_b", "name_zh": "演示食材·乙（蔬菜）", "name_en": "Demo vegetable B", "food_group": "vegetable", "min_age_months": 6, "choking_risk": "low" },
+    { "id": "demo_ing_c", "name_zh": "演示食材·丙（禽畜肉）", "name_en": "Demo meat C", "food_group": "meat", "min_age_months": 6, "choking_risk": "low" },
+    { "id": "demo_ing_d", "name_zh": "演示食材·丁（水果）", "name_en": "Demo fruit D", "food_group": "fruit", "min_age_months": 7, "choking_risk": "low" },
+    { "id": "demo_ing_e", "name_zh": "演示食材·戊（豆类）", "name_en": "Demo legume E", "food_group": "legume", "min_age_months": 8, "choking_risk": "low" },
+    { "id": "demo_ing_f", "name_zh": "演示食材·己（水产）", "name_en": "Demo fish F", "food_group": "fish", "min_age_months": 9, "choking_risk": "low" },
+    { "id": "demo_ing_g", "name_zh": "演示食材·庚（蛋类）", "name_en": "Demo egg G", "food_group": "egg", "min_age_months": 8, "choking_risk": "low" }
+  ],
+  "recipes": [
+    { "id": "demo_rcp_1", "name_zh": "演示方案·谷蔬泥", "texture": "puree", "time_cost_min": 15, "min_age_months": 6, "ingredients": ["demo_ing_a", "demo_ing_b"] },
+    { "id": "demo_rcp_2", "name_zh": "演示方案·肉泥粥", "texture": "puree", "time_cost_min": 25, "min_age_months": 6, "ingredients": ["demo_ing_a", "demo_ing_c"] },
+    { "id": "demo_rcp_3", "name_zh": "演示方案·水果糊", "texture": "puree", "time_cost_min": 8, "min_age_months": 7, "ingredients": ["demo_ing_d"] },
+    { "id": "demo_rcp_4", "name_zh": "演示方案·豆香软饭", "texture": "mashed", "time_cost_min": 30, "min_age_months": 8, "ingredients": ["demo_ing_a", "demo_ing_e"] },
+    { "id": "demo_rcp_5", "name_zh": "演示方案·鱼蔬碎", "texture": "minced", "time_cost_min": 22, "min_age_months": 9, "ingredients": ["demo_ing_f", "demo_ing_b"] },
+    { "id": "demo_rcp_6", "name_zh": "演示方案·蛋黄泥", "texture": "puree", "time_cost_min": 12, "min_age_months": 8, "ingredients": ["demo_ing_g"] }
+  ]
+}

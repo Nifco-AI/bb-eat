@@ -1,0 +1,33 @@
+name: Android APK
+on:
+  push:
+    branches: [main, 'feat/**']
+    paths: ['app/**', '.github/workflows/android-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - name: Verify Expo auth
+        run: eas whoami
+      - name: Build APK on EAS
+        run: eas build --platform android --profile preview --non-interactive --wait --json > build.json
+      - name: Show artifact info
+        run: node -e "const b=require('./build.json')[0];console.log(b.status,b.artifacts&&b.artifacts.buildUrl,b.gitCommitHash)"

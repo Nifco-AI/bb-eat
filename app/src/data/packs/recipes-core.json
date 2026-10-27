@@ -1,0 +1,660 @@
+{
+ "pack_id": "recipes-core",
+ "kind": "recipe",
+ "version": "2026-10-26.r1",
+ "note": "做法为自主撰写。所有食谱适用月龄为 unknown，因此不会进入自动推荐，只能由家长手动安排。",
+ "records": [
+  {
+   "id": "rcp_rice_congee",
+   "recipe_version": "1",
+   "name_zh": "软烂米粥",
+   "name_en": "Soft rice congee",
+   "texture": "puree",
+   "steps": [
+    "大米洗净，加约 8 倍水。",
+    "大火煮开后转小火，加盖焖煮约 20 分钟。",
+    "搅拌至顺滑，放至温热再喂。"
+   ],
+   "time_cost_min": 25,
+   "ingredients": [
+    {
+     "ingredient_id": "grain_rice",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_iron_cereal",
+   "recipe_version": "1",
+   "name_zh": "铁强化米粉糊",
+   "name_en": "Iron-fortified cereal",
+   "texture": "puree",
+   "steps": [
+    "按包装说明量取米粉。",
+    "用温水或温奶液边倒边搅拌。",
+    "调至适合的稠度，不加糖盐。"
+   ],
+   "time_cost_min": 5,
+   "ingredients": [
+    {
+     "ingredient_id": "grain_rice_cereal_fortified",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_pumpkin_puree",
+   "recipe_version": "1",
+   "name_zh": "南瓜泥",
+   "name_en": "Pumpkin purée",
+   "texture": "puree",
+   "steps": [
+    "南瓜去皮去籽，切块。",
+    "蒸约 15 分钟至能用勺子轻易压碎。",
+    "压成泥，视需要加少量温水调稀。"
+   ],
+   "time_cost_min": 20,
+   "ingredients": [
+    {
+     "ingredient_id": "veg_pumpkin",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_sweet_potato_puree",
+   "recipe_version": "1",
+   "name_zh": "红薯泥",
+   "name_en": "Sweet potato purée",
+   "texture": "puree",
+   "steps": [
+    "红薯洗净去皮切块。",
+    "蒸约 20 分钟至软透。",
+    "压成泥，放至温热。"
+   ],
+   "time_cost_min": 25,
+   "ingredients": [
+    {
+     "ingredient_id": "veg_sweet_potato",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_apple_puree",
+   "recipe_version": "1",
+   "name_zh": "苹果泥",
+   "name_en": "Apple purée",
+   "texture": "puree",
+   "steps": [
+    "苹果去皮去核切小块。",
+    "蒸约 10 分钟至软。",
+    "压成泥，放至温热。"
+   ],
+   "time_cost_min": 15,
+   "ingredients": [
+    {
+     "ingredient_id": "fruit_apple",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_pear_puree",
+   "recipe_version": "1",
+   "name_zh": "梨泥",
+   "name_en": "Pear purée",
+   "texture": "puree",
+   "steps": [
+    "梨去皮去核切块。",
+    "蒸约 10 分钟。",
+    "压成细泥。"
+   ],
+   "time_cost_min": 15,
+   "ingredients": [
+    {
+     "ingredient_id": "fruit_pear",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_banana_mash",
+   "recipe_version": "1",
+   "name_zh": "香蕉泥",
+   "name_en": "Banana mash",
+   "texture": "puree",
+   "steps": [
+    "选用成熟香蕉，剥皮。",
+    "用叉子压成泥。",
+    "现做现吃。"
+   ],
+   "time_cost_min": 3,
+   "ingredients": [
+    {
+     "ingredient_id": "fruit_banana",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_avocado_mash",
+   "recipe_version": "1",
+   "name_zh": "牛油果泥",
+   "name_en": "Avocado mash",
+   "texture": "puree",
+   "steps": [
+    "牛油果对半切开去核。",
+    "取果肉压成泥。",
+    "现做现吃。"
+   ],
+   "time_cost_min": 3,
+   "ingredients": [
+    {
+     "ingredient_id": "fruit_avocado",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_pork_puree",
+   "recipe_version": "1",
+   "name_zh": "猪瘦肉泥",
+   "name_en": "Pork purée",
+   "texture": "puree",
+   "steps": [
+    "猪瘦肉去筋膜，切小块。",
+    "冷水下锅煮约 20 分钟至全熟。",
+    "加少量煮肉汤，打成细腻肉泥。"
+   ],
+   "time_cost_min": 30,
+   "ingredients": [
+    {
+     "ingredient_id": "meat_pork_lean",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_chicken_puree",
+   "recipe_version": "1",
+   "name_zh": "鸡肉泥",
+   "name_en": "Chicken purée",
+   "texture": "puree",
+   "steps": [
+    "鸡胸肉切块。",
+    "蒸或煮约 15 分钟至全熟。",
+    "加少量汤汁打成泥。"
+   ],
+   "time_cost_min": 25,
+   "ingredients": [
+    {
+     "ingredient_id": "meat_chicken_breast",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_liver_puree",
+   "recipe_version": "1",
+   "name_zh": "猪肝泥",
+   "name_en": "Pork liver purée",
+   "texture": "puree",
+   "steps": [
+    "猪肝反复冲洗后切片。",
+    "彻底煮熟，中心无血色。",
+    "打成细泥，少量使用。"
+   ],
+   "time_cost_min": 30,
+   "ingredients": [
+    {
+     "ingredient_id": "meat_pork_liver",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_cod_puree",
+   "recipe_version": "1",
+   "name_zh": "鳕鱼泥",
+   "name_en": "Cod purée",
+   "texture": "puree",
+   "steps": [
+    "鳕鱼解冻后仔细检查并剔除鱼刺。",
+    "蒸约 10 分钟至全熟。",
+    "再次检查鱼刺后压成泥。"
+   ],
+   "time_cost_min": 20,
+   "ingredients": [
+    {
+     "ingredient_id": "fish_cod",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_egg_yolk_puree",
+   "recipe_version": "1",
+   "name_zh": "蛋黄泥",
+   "name_en": "Egg yolk purée",
+   "texture": "puree",
+   "steps": [
+    "鸡蛋冷水下锅煮约 10 分钟至全熟。",
+    "取出蛋黄。",
+    "加少量温水或奶液调成泥。"
+   ],
+   "time_cost_min": 15,
+   "ingredients": [
+    {
+     "ingredient_id": "egg_yolk",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_tofu_mash",
+   "recipe_version": "1",
+   "name_zh": "豆腐泥",
+   "name_en": "Tofu mash",
+   "texture": "mashed",
+   "steps": [
+    "嫩豆腐冲洗后切块。",
+    "蒸或焯烫约 5 分钟。",
+    "压成泥，沥去多余水分。"
+   ],
+   "time_cost_min": 10,
+   "ingredients": [
+    {
+     "ingredient_id": "legume_tofu",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_broccoli_mash",
+   "recipe_version": "1",
+   "name_zh": "西兰花泥",
+   "name_en": "Broccoli mash",
+   "texture": "mashed",
+   "steps": [
+    "西兰花切小朵，充分洗净。",
+    "蒸约 8 分钟至软。",
+    "压成泥或切成细碎。"
+   ],
+   "time_cost_min": 15,
+   "ingredients": [
+    {
+     "ingredient_id": "veg_broccoli",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_veg_rice_bowl",
+   "recipe_version": "1",
+   "name_zh": "蔬菜软饭",
+   "name_en": "Vegetable soft rice",
+   "texture": "minced",
+   "steps": [
+    "大米加较多水煮成软饭。",
+    "胡萝卜与西兰花蒸熟后切碎。",
+    "拌入软饭中混合均匀。"
+   ],
+   "time_cost_min": 30,
+   "ingredients": [
+    {
+     "ingredient_id": "grain_rice",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_carrot",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_broccoli",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_pork_veg_congee",
+   "recipe_version": "1",
+   "name_zh": "猪肉蔬菜粥",
+   "name_en": "Pork and vegetable congee",
+   "texture": "mashed",
+   "steps": [
+    "大米煮成软粥。",
+    "猪瘦肉煮熟后打成泥。",
+    "菠菜焯烫后切细碎，与肉泥一起拌入粥中。"
+   ],
+   "time_cost_min": 35,
+   "ingredients": [
+    {
+     "ingredient_id": "grain_rice",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "meat_pork_lean",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_spinach",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_chicken_pumpkin_puree",
+   "recipe_version": "1",
+   "name_zh": "鸡肉南瓜泥",
+   "name_en": "Chicken and pumpkin purée",
+   "texture": "puree",
+   "steps": [
+    "鸡胸肉与南瓜分别蒸熟。",
+    "一起打成细泥。",
+    "视需要加少量温水调稀。"
+   ],
+   "time_cost_min": 30,
+   "ingredients": [
+    {
+     "ingredient_id": "meat_chicken_breast",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_pumpkin",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_tofu_veg_soup",
+   "recipe_version": "1",
+   "name_zh": "豆腐蔬菜羹",
+   "name_en": "Tofu and vegetable soup",
+   "texture": "mashed",
+   "steps": [
+    "番茄去皮切小块，小白菜焯烫切碎。",
+    "加水煮软后放入豆腐块。",
+    "略煮后压碎，放至温热。"
+   ],
+   "time_cost_min": 20,
+   "ingredients": [
+    {
+     "ingredient_id": "legume_tofu",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_tomato",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "veg_bok_choy",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  },
+  {
+   "id": "rcp_oat_fruit_porridge",
+   "recipe_version": "1",
+   "name_zh": "燕麦水果糊",
+   "name_en": "Oat and fruit porridge",
+   "texture": "puree",
+   "steps": [
+    "燕麦加水煮约 10 分钟至软烂。",
+    "苹果蒸软压泥。",
+    "两者混合拌匀。"
+   ],
+   "time_cost_min": 15,
+   "ingredients": [
+    {
+     "ingredient_id": "grain_oat",
+     "amount_g": null
+    },
+    {
+     "ingredient_id": "fruit_apple",
+     "amount_g": null
+    }
+   ],
+   "min_age_months": null,
+   "age_status": "unknown",
+   "age_evidence": "本食谱由 BB-Eat 自行撰写，用料与做法可复现。适用月龄未核验：判断一道辅食是否适龄，除食材外还需评估质地、切法、熟制程度、噎食风险与食材组合，这需要专业审核，不能由最晚引入的单一食材月龄推导。",
+   "safety_note": "喂食全程需成人看护。食物温度、质地与分量应由照护者判断。",
+   "allergen_note": "若含常见致敏食材，食材详情页会单独标注。",
+   "regions": [
+    "GLOBAL"
+   ],
+   "source_id": "bbeat_editorial",
+   "license_note": "做法由 BB-Eat 自行撰写，未转载受版权保护的食谱文本。",
+   "review_status": "transcribed",
+   "is_synthetic": false
+  }
+ ]
+}
