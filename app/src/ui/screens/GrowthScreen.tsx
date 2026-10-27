@@ -3,7 +3,8 @@ import { Alert, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Text as SvgText } from 'react-native-svg';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ErrorState, Field, Row, Screen, SectionHeader, UnknownNotice } from '../components';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { spacing } from '../theme';
 import { listGrowth, normalisedValue, recordGrowth } from '../../domain/repositories/growth';
 import { FactValidationError } from '../../domain/repositories/events';
 import { computeZScore, referenceBand } from '../../domain/growthRef';
@@ -17,6 +18,7 @@ import { newId } from '../../domain/ids';
 import { ListTile } from '../components';
 
 export function GrowthScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
+  const { typography } = useTheme();
   const { db, baby, today, nowTime, refresh, revision } = useApp();
   const [kind, setKind] = useState<'weight' | 'length'>('weight');
   const [value, setValue] = useState('');
@@ -311,6 +313,7 @@ function GrowthChart({
   birthDate: string | null;
   measurements: GrowthMeasurement[];
 }) {
+  const { colors, typography } = useTheme();
   const points = measurements
     .map((m) => ({ x: ageInDays(birthDate, m.occurred_local_date), y: normalisedValue(m) }))
     .filter((p): p is { x: number; y: number } => p.x !== null);

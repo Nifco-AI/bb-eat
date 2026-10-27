@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,10 +7,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { AppProvider } from './src/ui/AppProvider';
+import { AppProvider, useApp } from './src/ui/AppProvider';
 import { ErrorState, LoadingState } from './src/ui/components';
 import { ErrorBoundary } from './src/ui/ErrorBoundary';
-import { colors, MIN_TOUCH, shadow, typography } from './src/ui/theme';
+import { ThemeProvider, useTheme } from './src/ui/ThemeProvider';
+import { MIN_TOUCH } from './src/ui/theme';
 import { TodayScreen } from './src/ui/screens/TodayScreen';
 import { RecommendScreen } from './src/ui/screens/RecommendScreen';
 import { GrowthScreen } from './src/ui/screens/GrowthScreen';
@@ -31,21 +32,35 @@ import {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const navTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.bg,
-    card: colors.surface,
-    text: colors.text,
-    border: colors.border,
-    primary: colors.sage,
-  },
-};
+/**
+ * React Navigation draws the header, the tab bar background and, importantly,
+ * the blank card shown mid-transition. Leaving it on its own default theme is
+ * what produces a white flash between screens in dark mode, so it is fed the
+ * same palette as everything else.
+ */
+function useNavTheme() {
+  const { colors, scheme } = useTheme();
+  return useMemo(
+    () => ({
+      ...DefaultTheme,
+      dark: scheme === 'dark',
+      colors: {
+        ...DefaultTheme.colors,
+        background: colors.bg,
+        card: colors.surface,
+        text: colors.text,
+        border: colors.border,
+        primary: colors.sage,
+      },
+    }),
+    [colors, scheme],
+  );
+}
 
 const TAB_ICONS: Record<string, string> = { 今日: '●', 推荐: '✦', 成长: '▲' };
 
 function Tabs() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -105,6 +120,7 @@ function guard<P extends object>(label: string, Component: React.ComponentType<P
 
 /** The quick-record button is global: recording must never be more than one tap away. */
 function Shell() {
+  const { colors, shadow } = useTheme();
   const [quick, setQuick] = useState(false);
   return (
     <View style={{ flex: 1 }}>
@@ -174,6 +190,7 @@ function Shell() {
  * first, so the records survive even when the app cannot open them.
  */
 function BootFailure({ message, retry }: { message: string; retry: () => void }) {
+  const { colors, typography } = useTheme();
   const [status, setStatus] = useState<string | null>(null);
 
   const rescue = async () => {
@@ -229,22 +246,60 @@ function BootFailure({ message, retry }: { message: string; retry: () => void })
   );
 }
 
+/**
+ * Everything below the database lives here so it can read the caregiver's
+ * saved theme choice. The status bar is set from the rendered scheme rather
+ * than hard-coded, otherwise dark-mode screens would get black icons on a
+ * near-black bar.
+ */
+function Themed() {
+  const { db } = useApp();
+  return (
+    <ThemeProvider db={db}>
+      <Chrome />
+    </ThemeProvider>
+  );
+}
+
+function Chrome() {
+  const { scheme } = useTheme();
+  const navTheme = useNavTheme();
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <NavigationContainer theme={navTheme}>
+        <Shell />
+      </NavigationContainer>
+    </>
+  );
+}
+
+function Loading() {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <LoadingState label="正在准备本地数据…" />
+    </View>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <AppProvider
-        renderLoading={() => (
-          <View style={{ flex: 1, backgroundColor: colors.bg }}>
-            <LoadingState label="正在准备本地数据…" />
-          </View>
-        )}
-        renderError={(message, retry) => <BootFailure message={message} retry={retry} />}
-      >
-        <NavigationContainer theme={navTheme}>
-          <Shell />
-        </NavigationContainer>
-      </AppProvider>
+      {/*
+        The outer provider has no database yet, so the loading and
+        boot-failure screens follow the system scheme. Once the database is
+        open, `Themed` layers a second provider over it that knows the saved
+        choice.
+      */}
+      <ThemeProvider db={null}>
+        <AppProvider
+          renderLoading={() => <Loading />}
+          renderError={(message, retry) => <BootFailure message={message} retry={retry} />}
+        >
+          <Themed />
+        </AppProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

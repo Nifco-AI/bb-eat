@@ -2,13 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { Switch, Text, View } from 'react-native';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ListTile, Row, Screen, SectionHeader, SyntheticBanner } from '../components';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { spacing } from '../theme';
 import { recommend } from '../../domain/recommend';
 import { listSlots, createSlot, addPlanItem, SyntheticContentError } from '../../domain/repositories/meals';
 import { ageInMonths } from '../../domain/time';
 import { Region } from '../../domain/types';
 
 export function RecommendScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
+  const { colors, typography } = useTheme();
   const { db, baby, today, demoMode, setDemoMode, refresh, revision } = useApp();
   const [applied, setApplied] = useState<string | null>(null);
   const [planError, setPlanError] = useState<string | null>(null);

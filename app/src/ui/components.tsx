@@ -9,7 +9,86 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { colors, MIN_TOUCH, radius, shadow, spacing, typography } from './theme';
+import { useTheme } from './ThemeProvider';
+import { ColorScheme, MIN_TOUCH, Palette, radius, shadowFor, spacing } from './theme';
+
+/**
+ * Styles that mention a colour cannot live in a module-level
+ * `StyleSheet.create`: that runs once at import time, which would freeze the
+ * app in whichever scheme happened to be active then. They are rebuilt only
+ * when the scheme changes.
+ */
+function makeStyles(colors: Palette, scheme: ColorScheme) {
+  return StyleSheet.create({
+    card: {
+      borderRadius: radius.md,
+      padding: spacing.lg,
+      marginBottom: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadowFor(scheme),
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    button: {
+      minHeight: MIN_TOUCH,
+      paddingHorizontal: spacing.lg,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    chip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.pill,
+      borderWidth: 1,
+    },
+    chipTouch: { minHeight: MIN_TOUCH, justifyContent: 'center', marginRight: spacing.sm, marginBottom: spacing.sm },
+    input: {
+      minHeight: MIN_TOUCH,
+      borderWidth: 1,
+      borderColor: colors.borderStrong,
+      borderRadius: radius.sm,
+      paddingHorizontal: spacing.md,
+      backgroundColor: colors.surface,
+      color: colors.text,
+      fontSize: 15,
+    },
+    centre: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+    notice: {
+      backgroundColor: colors.amberSoft,
+      borderRadius: radius.sm,
+      padding: spacing.md,
+      marginTop: spacing.sm,
+    },
+    synthetic: {
+      backgroundColor: colors.infoSoft,
+      borderRadius: radius.sm,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.info,
+      padding: spacing.md,
+      marginBottom: spacing.md,
+    },
+    row: { flexDirection: 'row', alignItems: 'center' },
+    tile: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      minHeight: MIN_TOUCH + 8,
+      paddingVertical: spacing.sm,
+    },
+  });
+}
+
+function useStyles() {
+  const { colors, scheme } = useTheme();
+  return React.useMemo(() => makeStyles(colors, scheme), [colors, scheme]);
+}
 
 export function Card({
   children,
@@ -20,6 +99,8 @@ export function Card({
   style?: ViewStyle;
   tone?: 'surface' | 'alt' | 'warn' | 'info';
 }) {
+  const { colors } = useTheme();
+  const styles = useStyles();
   const bg =
     tone === 'alt'
       ? colors.surfaceAlt
@@ -32,6 +113,8 @@ export function Card({
 }
 
 export function SectionHeader({ title, action }: { title: string; action?: React.ReactNode }) {
+  const { typography } = useTheme();
+  const styles = useStyles();
   return (
     <View style={styles.sectionHeader}>
       <Text style={typography.section}>{title}</Text>
@@ -55,6 +138,8 @@ export function Button({
   accessibilityHint?: string;
   style?: ViewStyle;
 }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   const palette = {
     primary: { bg: colors.sage, fg: colors.onAccent, border: colors.sage },
     secondary: { bg: colors.surface, fg: colors.text, border: colors.borderStrong },
@@ -95,6 +180,8 @@ export function Chip({
   onPress?: () => void;
   tone?: 'neutral' | 'warn' | 'danger' | 'info';
 }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   const toneBg = {
     neutral: colors.surfaceAlt,
     warn: colors.amberSoft,
@@ -154,6 +241,8 @@ export function Field({
   error?: string | null;
   multiline?: boolean;
 }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   return (
     <View style={{ marginBottom: spacing.lg }}>
       <Text style={[typography.label, { marginBottom: spacing.xs }]}>{label}</Text>
@@ -190,6 +279,7 @@ export function EmptyState({
   actionLabel?: string;
   onAction?: () => void;
 }) {
+  const { typography } = useTheme();
   return (
     <Card tone="alt" style={{ alignItems: 'center' }}>
       <Text style={[typography.bodyStrong, { textAlign: 'center' }]}>{title}</Text>
@@ -202,6 +292,8 @@ export function EmptyState({
 }
 
 export function LoadingState({ label = '正在加载…' }: { label?: string }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   return (
     <View style={styles.centre} accessibilityRole="progressbar">
       <ActivityIndicator color={colors.sage} />
@@ -219,6 +311,7 @@ export function ErrorState({
   detail: string;
   onRetry?: () => void;
 }) {
+  const { colors, typography } = useTheme();
   return (
     <Card style={{ borderColor: colors.danger, borderWidth: 1 }}>
       <Text style={[typography.bodyStrong, { color: colors.danger }]}>{title}</Text>
@@ -233,6 +326,8 @@ export function ErrorState({
  * never shown a number that silently treats "unknown" as zero.
  */
 export function UnknownNotice({ text }: { text: string }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   return (
     <View style={styles.notice}>
       <Text style={[typography.caption, { color: colors.amber }]}>⚠︎ {text}</Text>
@@ -241,6 +336,8 @@ export function UnknownNotice({ text }: { text: string }) {
 }
 
 export function SyntheticBanner({ text }: { text: string }) {
+  const { colors, typography } = useTheme();
+  const styles = useStyles();
   return (
     <View style={styles.synthetic}>
       <Text style={[typography.label, { color: colors.info }]}>演示数据</Text>
@@ -250,6 +347,7 @@ export function SyntheticBanner({ text }: { text: string }) {
 }
 
 export function Row({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
+  const styles = useStyles();
   return <View style={[styles.row, style]}>{children}</View>;
 }
 
@@ -262,6 +360,7 @@ export function Screen({
   scroll?: boolean;
   padded?: boolean;
 }) {
+  const { colors } = useTheme();
   const inner = padded ? { padding: spacing.lg, paddingBottom: spacing.xxl * 3 } : undefined;
   if (!scroll) return <View style={[{ flex: 1, backgroundColor: colors.bg }, inner]}>{children}</View>;
   return (
@@ -284,6 +383,8 @@ export function ListTile({
   onPress?: () => void;
   accessibilityHint?: string;
 }) {
+  const { typography } = useTheme();
+  const styles = useStyles();
   const content = (
     <View style={styles.tile}>
       <View style={{ flex: 1, paddingRight: spacing.md }}>
@@ -300,68 +401,3 @@ export function ListTile({
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadow,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  button: {
-    minHeight: MIN_TOUCH,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-  },
-  chipTouch: { minHeight: MIN_TOUCH, justifyContent: 'center', marginRight: spacing.sm, marginBottom: spacing.sm },
-  input: {
-    minHeight: MIN_TOUCH,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.surface,
-    color: colors.text,
-    fontSize: 15,
-  },
-  centre: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
-  notice: {
-    backgroundColor: colors.amberSoft,
-    borderRadius: radius.sm,
-    padding: spacing.md,
-    marginTop: spacing.sm,
-  },
-  synthetic: {
-    backgroundColor: colors.infoSoft,
-    borderRadius: radius.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.info,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  tile: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: MIN_TOUCH + 8,
-    paddingVertical: spacing.sm,
-  },
-});

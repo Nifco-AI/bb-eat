@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, Text, View } from 'react-native';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ErrorState, Field, ListTile, Row, Screen, SectionHeader, UnknownNotice } from '../components';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { spacing, ThemeMode } from '../theme';
 import {
   MealSlotView,
   SLOT_LABEL_SUGGESTIONS,
@@ -22,6 +23,7 @@ import { IntakeMode, INTAKE_MODE_LABELS } from '../../domain/types';
 import { OccurredAtField, useOccurredAt } from '../OccurredAt';
 
 export function TodayScreen({ navigation }: { navigation: { navigate: (s: string, p?: object) => void } }) {
+  const { colors, typography } = useTheme();
   const { db, baby, today, nowTime, refresh, revision } = useApp();
   // `offset` rather than an absolute date: the caregiver's intent is "the day I
   // am looking at relative to today". Storing the absolute date would strand
@@ -324,6 +326,7 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
         />
       ) : null}
       <SectionHeader title="资料与设置" />
+      <ThemeCard />
       <Card>
         <Row style={{ flexWrap: 'wrap' }}>
           <Button
@@ -362,6 +365,40 @@ export function TodayScreen({ navigation }: { navigation: { navigate: (s: string
   );
 }
 
+/**
+ * Deliberately on the Today screen rather than buried in a settings page. The
+ * moment a caregiver wants this is the moment a bright screen has just woken
+ * the baby, and that is not a moment for navigating three levels deep.
+ *
+ * "跟随系统" stays the default. The explicit light/dark options exist because
+ * following the system is wrong often enough here: a phone kept in light mode
+ * all day may still need this one app dark at 3am, and some Android skins
+ * drive night mode from a schedule the caregiver does not control.
+ */
+function ThemeCard() {
+  const { typography, mode, setMode, scheme } = useTheme();
+  const options: { value: ThemeMode; label: string }[] = [
+    { value: 'system', label: '跟随系统' },
+    { value: 'light', label: '浅色' },
+    { value: 'dark', label: '深色' },
+  ];
+  return (
+    <Card>
+      <Text style={typography.label}>外观</Text>
+      <Row style={{ flexWrap: 'wrap', marginTop: spacing.sm }}>
+        {options.map((o) => (
+          <Chip key={o.value} label={o.label} selected={mode === o.value} onPress={() => setMode(o.value)} />
+        ))}
+      </Row>
+      <Text style={[typography.caption, { marginTop: spacing.xs }]}>
+        {mode === 'system'
+          ? `当前跟随系统，正在使用${scheme === 'dark' ? '深色' : '浅色'}。`
+          : '已固定为手动选择，不再跟随系统的日夜切换。'}
+      </Text>
+    </Card>
+  );
+}
+
 function describeIntakeText(mode: IntakeMode, ratio: number | null, grams: number | null): string {
   if (mode === 'ratio' && ratio !== null) return `吃下约 ${Math.round(ratio * 100)}%`;
   if (mode === 'absolute' && grams !== null) return `吃下约 ${grams} g`;
@@ -377,12 +414,14 @@ function SlotEditorModal({
   onClose: () => void;
   onCreate: (label: string, time: string | null) => void;
 }) {
+  const { typography } = useTheme();
+  const sheetStyles = useSheetStyles();
   const [label, setLabel] = useState('');
   const [time, setTime] = useState('');
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={sheetBackdrop}>
-        <View style={sheet}>
+      <View style={sheetStyles.backdrop}>
+        <View style={sheetStyles.sheet}>
           <Text style={typography.title}>添加餐次</Text>
           <Text style={[typography.caption, { marginTop: spacing.xs, marginBottom: spacing.md }]}>
             按你家实际的作息来，不必和任何标准模板一致。
@@ -436,6 +475,8 @@ function FeedingModal({
   onClose: () => void;
   onSubmit: (mode: IntakeMode, ratio: number | null, grams: number | null, occurredAt: Date) => void;
 }) {
+  const { typography } = useTheme();
+  const sheetStyles = useSheetStyles();
   const [mode, setMode] = useState<IntakeMode>('unknown');
   const [ratio, setRatio] = useState<number | null>(null);
   const [grams, setGrams] = useState('');
@@ -454,8 +495,8 @@ function FeedingModal({
 
   return (
     <Modal visible animationType="slide" transparent onRequestClose={onClose}>
-      <View style={sheetBackdrop}>
-        <View style={sheet}>
+      <View style={sheetStyles.backdrop}>
+        <View style={sheetStyles.sheet}>
           <Text style={typography.title}>记录「{slot.label}」</Text>
           <Text style={[typography.caption, { marginTop: spacing.xs }]}>
             实际提供的内容已按计划带入：{slot.items.map((i) => i.display_name).join('、')}
@@ -513,17 +554,27 @@ function FeedingModal({
   );
 }
 
-export const sheetBackdrop = {
-  flex: 1,
-  backgroundColor: 'rgba(58,52,48,0.35)',
-  justifyContent: 'flex-end' as const,
-};
-
-export const sheet = {
-  backgroundColor: colors.bg,
-  borderTopLeftRadius: 24,
-  borderTopRightRadius: 24,
-  padding: spacing.xl,
-  paddingBottom: spacing.xxl,
-  maxHeight: '88%' as const,
-};
+/**
+ * The bottom-sheet chrome is shared with QuickRecordSheet. It is a hook rather
+ * than a constant because both halves depend on the active scheme: the scrim
+ * has to be heavier in dark mode to still read as a scrim against an already
+ * dark screen.
+ */
+export function useSheetStyles() {
+  const { colors, scheme } = useTheme();
+  return {
+    backdrop: {
+      flex: 1,
+      backgroundColor: scheme === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(58,52,48,0.35)',
+      justifyContent: 'flex-end' as const,
+    },
+    sheet: {
+      backgroundColor: colors.bg,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      padding: spacing.xl,
+      paddingBottom: spacing.xxl,
+      maxHeight: '88%' as const,
+    },
+  };
+}

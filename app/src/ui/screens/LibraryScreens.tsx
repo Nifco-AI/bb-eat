@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, EmptyState, ListTile, Row, Screen, SectionHeader } from '../components';
-import { colors, MIN_TOUCH, radius, spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { MIN_TOUCH, radius, spacing } from '../theme';
 import { addPlanItem } from '../../domain/repositories/meals';
 import { addAvoidItem, addInventoryItem, removeAvoidItem, removeInventoryItem, searchInventoryCandidates } from '../../domain/repositories/inventory';
 import {
@@ -30,6 +31,7 @@ export function IngredientsScreen({
   navigation: Nav;
   route: { params?: { onPickSlotId?: string; mode?: 'avoid' } };
 }) {
+  const { colors, typography } = useTheme();
   const { db, baby, demoMode, refresh, revision } = useApp();
   const [query, setQuery] = useState('');
   const [group, setGroup] = useState<string | null>(null);
@@ -178,6 +180,7 @@ export function RecipesScreen({
   navigation: Nav;
   route?: { params?: { onPickSlotId?: string } };
 }) {
+  const { typography } = useTheme();
   const { db, demoMode, refresh, revision } = useApp();
   const pickSlotId = route?.params?.onPickSlotId;
   const recipes = useMemo(() => {
@@ -225,6 +228,7 @@ export function RecipesScreen({
 }
 
 export function RecipeDetailScreen({ route }: { route: { params: { recipeId: string } } }) {
+  const { typography } = useTheme();
   const { db, revision } = useApp();
   const recipe = useMemo(
     () => db.get<Recipe>('SELECT * FROM recipes WHERE id = ?', [route.params.recipeId]),
@@ -318,6 +322,7 @@ export function RecipeDetailScreen({ route }: { route: { params: { recipeId: str
 }
 
 export function InventoryScreen() {
+  const { colors, typography } = useTheme();
   const { db, baby, refresh, revision } = useApp();
   const [query, setQuery] = useState('');
 

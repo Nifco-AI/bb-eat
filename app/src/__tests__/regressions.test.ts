@@ -10,7 +10,8 @@ import { sha256Hex } from '../domain/sha256';
 import { MIGRATIONS, migrate } from '../db/migrations';
 import { createNodeDriver } from '../db/nodeDriver';
 import { loadPacks } from '../data/loadPacks';
-import { ensureBaby } from '../domain/repositories/babies';
+import { ensureBaby, getSetting, setSetting } from '../domain/repositories/babies';
+import { THEME_MODE_KEY, modeFromStored, resolveScheme } from '../ui/themeMode';
 import {
   addAvoidItem,
   addInventoryItem,
@@ -653,6 +654,35 @@ describe('round 2 regressions', () => {
       )!.id;
       expect(() => addInventoryItem(db, baby.id, { ingredientId: real })).not.toThrow();
       expect(() => addAvoidItem(db, baby.id, real)).not.toThrow();
+    });
+  });
+
+  describe('theme: a saved preference must not silently stop following the system', () => {
+    it('keeps "follow the system" as a mode, so the phone switching to night still flips the app', () => {
+      expect(resolveScheme('system', 'dark')).toBe('dark');
+      expect(resolveScheme('system', 'light')).toBe('light');
+    });
+
+    it('lets an explicit choice win over the system, which is the point of the override', () => {
+      expect(resolveScheme('dark', 'light')).toBe('dark');
+      expect(resolveScheme('light', 'dark')).toBe('light');
+    });
+
+    it('falls back to following the system for an unreadable stored value', () => {
+      // A downgrade, a corrupted row or a restored backup from a newer build
+      // can all put something unexpected here. Guessing 'light' would strand a
+      // caregiver on a bright screen at night with no obvious cause.
+      expect(modeFromStored(null)).toBe('system');
+      expect(modeFromStored('')).toBe('system');
+      expect(modeFromStored('midnight')).toBe('system');
+      expect(modeFromStored('dark')).toBe('dark');
+    });
+
+    it('survives a round trip through the same settings table the app uses', () => {
+      const { db } = setup();
+      expect(modeFromStored(getSetting(db, THEME_MODE_KEY))).toBe('system');
+      setSetting(db, THEME_MODE_KEY, 'dark');
+      expect(modeFromStored(getSetting(db, THEME_MODE_KEY))).toBe('dark');
     });
   });
 

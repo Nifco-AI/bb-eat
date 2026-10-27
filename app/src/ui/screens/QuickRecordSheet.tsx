@@ -3,9 +3,10 @@ import { Modal, Text, View } from 'react-native';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, ErrorState, Field, Row, UnknownNotice } from '../components';
 import { OccurredAtField, useOccurredAt } from '../OccurredAt';
-import { sheet, sheetBackdrop } from './TodayScreen';
+import { useSheetStyles } from './TodayScreen';
 import { newId } from '../../domain/ids';
-import { spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { spacing } from '../theme';
 import {
   FactValidationError,
   QUICK_ML_PRESETS,
@@ -31,6 +32,8 @@ const TABS: { key: Tab; label: string }[] = [
  * caregiver's suspicion is not a symptom or a diagnosis.
  */
 export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
+  const { typography } = useTheme();
+  const sheetStyles = useSheetStyles();
   const { db, baby, today, nowTime, refresh } = useApp();
   const [tab, setTab] = useState<Tab>('liquid');
   const [error, setError] = useState<string | null>(null);
@@ -154,8 +157,8 @@ export function QuickRecordSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal visible animationType="slide" transparent onRequestClose={onClose}>
-      <View style={sheetBackdrop}>
-        <View style={sheet}>
+      <View style={sheetStyles.backdrop}>
+        <View style={sheetStyles.sheet}>
           <Text style={typography.title}>快速记录</Text>
           <Row style={{ flexWrap: 'wrap', marginTop: spacing.md, marginBottom: spacing.sm }}>
             {TABS.map((t) => (

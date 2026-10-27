@@ -11,6 +11,7 @@ const ingredients = load('ingredients-core').records;
 const recipes = load('recipes-core').records;
 const sources = load('sources').records;
 const demo = load('demo-synthetic');
+const contrast = require('./contrast').check();
 
 const tally = (rows, key) =>
   rows.reduce((acc, row) => {
@@ -64,6 +65,16 @@ const out = {
   // expert-reviewed recipe, so with none, every real recipe is unrecommendable.
   // Computed here rather than asserted, so the report cannot drift from the
   // rule in recommend.ts.
+  // Not cosmetic: the "unknown is not zero" and choking/allergen disclaimers
+  // are all rendered as captions.
+  contrast: {
+    pairs_checked_per_scheme: contrast.rows.length / 2,
+    schemes: ['light', 'dark'],
+    minimum_required: 4.5,
+    worst_light: Math.min(...contrast.rows.filter((r) => r.scheme === 'light').map((r) => r.r)),
+    worst_dark: Math.min(...contrast.rows.filter((r) => r.scheme === 'dark').map((r) => r.r)),
+    failures: contrast.failures,
+  },
   recommendability: {
     real_recipes: recipes.length,
     expert_reviewed_recipes: recipes.filter((r) => r.review_status === 'expert_reviewed').length,
@@ -84,7 +95,17 @@ const invariants = [
     'section 6 reports every real recipe as non-auto-recommendable',
     out.recommendability.not_auto_recommendable === out.recommendability.real_recipes,
   ],
+  // The safety and "unknown" disclaimers are rendered as captions, so a
+  // caption that cannot be read in a dim room is a safety defect, not a
+  // cosmetic one. Checked for both schemes.
+  [
+    'every rendered text/background pair meets WCAG AA in both schemes',
+    contrast.failures.length === 0,
+  ],
 ];
+if (contrast.failures.length > 0) {
+  console.error('\nCONTRAST FAILURES:\n' + contrast.failures.map((f) => '  - ' + f).join('\n'));
+}
 const broken = invariants.filter(([, ok]) => !ok).map(([label]) => label);
 if (broken.length > 0) {
   console.error('\nDATA QUALITY INVARIANT BROKEN:\n' + broken.map((b) => '  - ' + b).join('\n'));

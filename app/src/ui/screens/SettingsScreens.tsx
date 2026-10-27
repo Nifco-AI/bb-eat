@@ -5,7 +5,8 @@ import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { useApp } from '../AppProvider';
 import { Button, Card, Chip, ErrorState, Field, ListTile, Row, Screen, SectionHeader } from '../components';
-import { colors, spacing, typography } from '../theme';
+import { useTheme } from '../ThemeProvider';
+import { spacing } from '../theme';
 import { updateBaby, validateBirthDate } from '../../domain/repositories/babies';
 import {
   BackupRejected,
@@ -24,6 +25,7 @@ import appJson from '../../../app.json';
 const APP_VERSION: string = (appJson as { expo: { version: string } }).expo.version;
 
 export function BabyProfileScreen() {
+  const { typography } = useTheme();
   const { db, baby, refresh } = useApp();
   const [name, setName] = useState(baby.name ?? '');
   const [birth, setBirth] = useState(baby.birth_date ?? '');
@@ -122,6 +124,7 @@ export function BabyProfileScreen() {
 }
 
 export function BackupScreen() {
+  const { colors, typography } = useTheme();
   const { db, refresh } = useApp();
   const [pending, setPending] = useState<{ text: string; summary: BackupSummary } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -248,6 +251,7 @@ export function BackupScreen() {
 }
 
 export function SourcesScreen() {
+  const { colors, typography } = useTheme();
   const { db, revision } = useApp();
   const sources = useMemo(
     () => db.all<SourceRecord>('SELECT * FROM sources ORDER BY publisher, title'),
@@ -317,6 +321,7 @@ export function SourcesScreen() {
 }
 
 export function PrivacyScreen({ navigation }: { navigation: { navigate: (s: string) => void } }) {
+  const { typography } = useTheme();
   const { db, baby, refresh } = useApp();
   return (
     <Screen>

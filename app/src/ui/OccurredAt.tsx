@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { Chip, Row } from './components';
-import { colors, MIN_TOUCH, radius, spacing, typography } from './theme';
+import { useTheme } from './ThemeProvider';
+import { MIN_TOUCH, radius, spacing } from './theme';
 import { instantFromLocal, localTimeFrom, offsetMinutesFor, shiftLocalDate } from '../domain/time';
 
 /**
@@ -74,6 +75,7 @@ export function OccurredAtField({
   onDateChange: (d: string) => void;
   onTimeChange: (t: string) => void;
 }) {
+  const { colors, typography } = useTheme();
   // `today` comes from the app state rather than being recomputed here, so the
   // control stays pure and always agrees with the rest of the app about which
   // local day it is.
