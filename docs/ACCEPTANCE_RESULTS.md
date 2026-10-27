@@ -17,17 +17,20 @@ UI 操作通过 `uiautomator` 按控件文本定位驱动，非盲点坐标。
 | 项目 | 值 |
 |---|---|
 | 文件 | `app/android/app/build/outputs/apk/release/app-release.apk` |
-| SHA-256 | `02b784c99914e750b111694e76b6777e3beb431e10f7c2cd86338842ed406d8d` |
-| 大小 | 90,951,023 字节（约 86.7 MiB，universal，含 4 个 ABI） |
+| 下载 | https://github.com/Nifco-AI/bb-eat/releases/download/v0.1.1-internal/bb-eat-0.1.1-8d06155.apk （仓库已公开，匿名可下） |
+| SHA-256 | `d5cffc37f64dcabfcc829488e8728ab2b237b65ab7cb0051f9b8e46218715c28` |
+| 大小 | 90,956,379 字节（约 86.7 MiB，universal，含 4 个 ABI） |
 | 包名 | `ai.nifco.bbeat` |
 | 版本 | versionName `0.1.0`，versionCode `1` |
 | minSdk / targetSdk | 24 / 36 |
 | 原生 ABI | `arm64-v8a`、`armeabi-v7a`、`x86`、`x86_64` |
-| Git commit | `c4b37f7` |
+| Git commit | `8d06155`（含深色主题） |
 | 构建命令 | `npx expo prebuild --platform android --no-install` 然后 `./gradlew assembleRelease` |
 | 构建类型 | 独立 release APK。**不是** .aab，不依赖 Metro，不需要 Expo Go |
 
-验证方式：`aapt dump badging`、`sha256sum`，以及在模拟器上 `adb install -r` 后冷启动。
+验证方式：`aapt dump badging`、`sha256sum`，以及在模拟器上 `adb install -r` 后冷启动。上表 SHA-256 已用**未登录的 `curl`** 从上述公开链接重新下载核对，与本地构建产物逐位一致。
+
+签名：Gradle 默认 debug keystore。可安装、可升级覆盖，但**不可用于正式分发**；更换为独立 upload key 需要用户自己掌管私钥（CONSTRAINTS.md §5）。
 
 ---
 
